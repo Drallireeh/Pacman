@@ -12,6 +12,7 @@ const game = new Phaser.Game(
 );
 
 let map;
+let player;
 let layer;
 let num_dots;
 
@@ -31,19 +32,10 @@ function preload() {
 }
 
 function create() {
-    game.stage.backgroundColor = "#4488AA";
+    game.stage.backgroundColor = "#4488AA"; // temp
+    
     map = new Map('map');
-
-    // game.sprite = game.add.sprite((2 * 16) + 8, (0 * 16) + 8, 'pacman', 0);
-    // game.sprite.anchor.setTo(0.5);
-    // game.sprite.animations.add('munch', [0, 1, 2, 1], 20, true);
-    // game.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
-    
-    // game.physics.arcade.enable(game.sprite);
-    // game.sprite.body.setSize(16, 16, 0, 0);
-    
-    // game.sprite.play('munch');
-    // move(Phaser.LEFT);
+    player = new Player(16);
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
@@ -53,46 +45,3 @@ function update() {
 
 function render() {
 }
-
-// function move(direction) {
-//     if (direction === Phaser.NONE) {
-//         game.sprite.body.velocity.x = game.sprite.body.velocity.y = 0;
-//         return;
-//     }
-    
-//     var speed = game.speed;
-
-//     if (direction === Phaser.LEFT || direction === Phaser.UP)
-//     {
-//         speed = -speed;
-//     }
-
-//     if (direction === Phaser.LEFT || direction === Phaser.RIGHT)
-//     {
-//         game.sprite.body.velocity.x = speed;
-//     }
-//     else
-//     {
-//         game.sprite.body.velocity.y = speed;
-//     }
-
-//     //  Reset the scale and angle (Pacman is facing to the right in the sprite sheet)
-//     game.sprite.scale.x = 1;
-//     game.sprite.angle = 0;
-
-//     if (direction === Phaser.LEFT)
-//     {
-//         game.sprite.scale.x = -1;
-//     }
-//     else if (direction === Phaser.UP)
-//     {
-//         game.sprite.angle = 270;
-//     }
-//     else if (direction === Phaser.DOWN)
-//     {
-//         game.sprite.angle = 90;
-//     }
-
-//     game.current = direction;
-
-// }
