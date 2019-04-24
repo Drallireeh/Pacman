@@ -1,33 +1,37 @@
 class Map {
     constructor(tilemap) {
+        this.tilemap = null;
+        this.layer = null;
+
+        this.numDots = 0;
+        this.totalDots = 0;
+
+        this.safetile = 4;
+
         this.create(tilemap);
     }
 
     create(tilemap) {
-        this.map = game.add.tilemap(tilemap);
+        this.tilemap = game.add.tilemap(tilemap);
 
-        this.map.addTilesetImage('empty-tile', 'empty-tile');
-        this.map.addTilesetImage('lemon', 'lemon-tile');
-        this.map.addTilesetImage('dot', 'dot-tile');
-        this.map.addTilesetImage('barrier', 'barrier');
+        this.tilemap.addTilesetImage('empty-tile', 'empty-tile');
+        this.tilemap.addTilesetImage('lemon', 'lemon-tile');
+        this.tilemap.addTilesetImage('dot', 'dot-tile');
+        this.tilemap.addTilesetImage('barrier', 'barrier');
+        this.tilemap.addTilesetImage('wall', 'wall');
 
-        this.layer = this.map.createLayer('Level 1');
-        this.numbDots = this.countDots(1);
-        this.totalDots = this.numbDots;
+        this.layer = this.tilemap.createLayer('Level 1');
 
+        this.dots = game.add.physicsGroup();
+        this.numDots = this.tilemap.createFromTiles(1, this.safetile, 'dot-tile', this.layer, this.dots);
+        this.totalDots = this.numDots;
+
+        this.pills = game.add.physicsGroup();
+        this.numPills = this.tilemap.createFromTiles(3, this.safetile, "lemon-tile", this.layer, this.pills);
+
+        this.tilemap.setCollisionByExclusion([this.safetile], true, this.layer);
+
+        console.log(this.layer.layer)
         // this.layer.setScale(2,2);
-        // this.layer.resizeWorld();
-    }
-
-    countDots(id) {
-        let numbDots = 0
-
-        for (let i = 0; i < this.layer.layer.data.length; i++) {
-            for (let j = 0; j < this.layer.layer.data[i].length; j++) {
-                if (this.layer.layer.data[i][j].index === id) numbDots++;
-            }
-        }
-
-        return numbDots;
     }
 }

@@ -11,11 +11,6 @@ const game = new Phaser.Game(
     }
 );
 
-let map;
-let player;
-let layer;
-let num_dots;
-
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
@@ -24,6 +19,7 @@ function preload() {
     Phaser.Canvas.setImageRenderingCrisp(game.canvas);
 
     game.load.image('empty-tile', '../Assets/Images/empty-tile.jpg');
+    game.load.image('wall', '../Assets/Images/wall.jpg');
     game.load.image('lemon-tile', '../Assets/Images/lemon.png');
     game.load.image('dot-tile', '../Assets/Images/dot.jpg');
     game.load.image('barrier', '../Assets/Images/barrier.png');
@@ -33,14 +29,15 @@ function preload() {
 
 function create() {
     game.stage.backgroundColor = "#4488AA"; // temp
-    
-    map = new Map('map');
-    player = new Player(16);
+
+    game.map = new Map('map');
+    game.player = new Player(16);
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
 
 function update() {
+    game.player.update();
 }
 
 function render() {
