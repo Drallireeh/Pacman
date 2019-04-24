@@ -1,6 +1,5 @@
 class Player {
-    constructor(tilePixels) {
-        this.tilePixels = tilePixels;
+    constructor() {
         this.score = 0;
         this.speed = 100;
         this.position = {
@@ -14,13 +13,13 @@ class Player {
 
     create() {
         // Add pacman sprite, add 8 for anchor
-        this.sprite = game.add.sprite((this.position.x * this.tilePixels) + 8, (this.position.y * this.tilePixels) + 8, 'pacman', 0);
+        this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
         this.sprite.anchor.setTo(0.5);
         this.sprite.animations.add('munch', [0, 1, 2, 1], 20, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
 
         game.physics.arcade.enable(this.sprite);
-        this.sprite.body.setSize(this.tilePixels, this.tilePixels, 0, 0);
+        this.sprite.body.setSize(game.tileSize, game.tileSize, 0, 0);
         this.sprite.body.collideWorldBounds=true;
 
         this.sprite.play('munch');
@@ -33,8 +32,8 @@ class Player {
         game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
         game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
 
-        this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), this.tilePixels) / this.tilePixels;
-        this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), this.tilePixels) / this.tilePixels;
+        this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
+        this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
         if (this.position.y === 13) {
             this.sprite.body.collideWorldBounds = false;
