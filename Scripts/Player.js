@@ -2,12 +2,19 @@ class Player {
     constructor() {
         this.score = 0;
         this.speed = 100;
-        this.position = {
-            x: 5,
-            y: 0
-        };
-        this.directions = [null, null, null, null];
+        this.position = new Phaser.Point();
+        this.turnPoint = new Phaser.Point();
+
+        this.tiles_around = [null, null, null, null, null];
+        this.directions = [Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP];
+        
         this.current = Phaser.NONE;
+        this.turning = Phaser.NONE;
+        this.want2go = Phaser.NONE;
+
+        this.keyPressTimer = 0;
+        this.KEY_COOLING_DOWN_TIME = 750;
+
         this.create();
     }
 
@@ -20,10 +27,12 @@ class Player {
 
         game.physics.arcade.enable(this.sprite);
         this.sprite.body.setSize(game.tileSize, game.tileSize, 0, 0);
-        this.sprite.body.collideWorldBounds=true;
+        this.sprite.body.collideWorldBounds = true;
 
         this.sprite.play('munch');
         this.move(Phaser.DOWN);
+
+        this.cursors = game.input.keyboard.createCursorKeys();
     }
 
     update() {
@@ -47,11 +56,84 @@ class Player {
         else this.sprite.body.collideWorldBounds = true;
 
         // Check which tiles are around us
-        this.directions[0] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
-        this.directions[1] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
-        this.directions[2] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
-        this.directions[3] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
+        this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
+        this.tiles_around[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
+        this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
+        this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
 
+        if (this.turning !== Phaser.NONE) {
+            this.turn();
+        }
+
+        this.checkKeys();
+    }
+
+    checkKeys() {
+        if (this.cursors.left.isDown ||
+            this.cursors.right.isDown ||
+            this.cursors.up.isDown ||
+            this.cursors.down.isDown) {
+            this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
+        }
+
+        if (this.cursors.left.isDown && this.current !== Phaser.LEFT) {
+            this.want2go = Phaser.LEFT;
+        }
+        else if (this.cursors.right.isDown && this.current !== Phaser.RIGHT) {
+            this.want2go = Phaser.RIGHT;
+        }
+        else if (this.cursors.up.isDown && this.current !== Phaser.UP) {
+            this.want2go = Phaser.UP;
+        }
+        else if (this.cursors.down.isDown && this.current !== Phaser.DOWN) {
+            this.want2go = Phaser.DOWN;
+        }
+
+        if (game.time.time > this.keyPressTimer) {
+            //  This forces them to hold the key down to turn the corner
+            this.turning = Phaser.NONE;
+            this.want2go = Phaser.NONE;
+        } else {
+            this.checkDirection(this.want2go);
+        }
+    }
+
+    checkDirection(turnTo) {
+        if (this.turning === turnTo || this.tiles_around[turnTo] === null || this.tiles_around[turnTo].index !== game.map.safetile) {
+            //  If the direction is already the same, if there is no tile available here --> return
+            return;
+        }
+        if (this.current === this.directions[turnTo]) {
+            this.move(turnTo);
+            this.keyPressTimer = game.time.time;
+        }
+        else {
+            this.turning = turnTo;
+
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+            this.want2go = Phaser.NONE;
+        }
+    }
+
+    turn() {
+        let cx = Math.floor(this.sprite.x);
+        let cy = Math.floor(this.sprite.y);
+
+        //  This needs a threshold, because at high speeds you can't turn because the coordinates skip past
+        if (!game.math.fuzzyEqual(cx, this.turnPoint.x, 3) || !game.math.fuzzyEqual(cy, this.turnPoint.y, 3)) {
+            return false;
+        }
+
+        //  Grid align before turning
+        this.sprite.x = this.turnPoint.x;
+        this.sprite.y = this.turnPoint.y;
+
+        this.sprite.body.reset(this.turnPoint.x, this.turnPoint.y);
+        this.move(this.turning);
+        this.turning = Phaser.NONE;
+
+        return true;
     }
 
     move(direction) {

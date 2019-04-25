@@ -23,9 +23,10 @@ function preload() {
     game.load.image('empty-tile', '../Assets/Images/empty-tile.jpg');
     game.load.image('wall', '../Assets/Images/wall.jpg');
     game.load.image('lemon-tile', '../Assets/Images/lemon.png');
-    game.load.image('dot-tile', '../Assets/Images/dot.jpg');
+    game.load.image('dot', '../Assets/Images/dot.png');
+    game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
     game.load.image('barrier', '../Assets/Images/barrier.png');
-    game.load.spritesheet('pacman', '../Assets/Images/pacman.png', game.tileSize, game.tileSize);
+    game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16); // Version 16 pixels
     game.load.tilemap('map', '../Assets/tileMap.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
