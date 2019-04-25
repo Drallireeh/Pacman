@@ -34,7 +34,6 @@ function create() {
     game.map = new Map('map');
     game.player = new Player();
     
-    game.scoreText = game.add.text(200, 100, 'Score : ' + game.player.score, {font: '18px arcade_normalregular', fill: '#ff0000'});
     addTimer();
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
@@ -52,6 +51,4 @@ function addTimer() {
     game.time.removeAll();
 
     game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * 5, game.player.playAlone, this);
-
-    return;
 }
