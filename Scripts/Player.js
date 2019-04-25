@@ -2,12 +2,16 @@ class Player {
     constructor() {
         this.score = 0;
         this.speed = 100;
+        this.life = 2;
         this.position = new Phaser.Point();
         this.turnPoint = new Phaser.Point();
 
+        this.isDead = false;
+        this.isAnimatingDeath = false;
+
         this.tiles_around = [null, null, null, null, null];
         this.directions = [Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP];
-        
+
         this.current = Phaser.NONE;
         this.turning = Phaser.NONE;
         this.want2go = Phaser.NONE;
@@ -36,36 +40,44 @@ class Player {
     }
 
     update() {
-        // Enable collisions
-        game.physics.arcade.collide(this.sprite, game.map.layer);
-        game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
-        game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
+        if (!this.isDead) {// Enable collisions
+            game.physics.arcade.collide(this.sprite, game.map.layer);
+            game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
+            game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
 
-        this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
-        this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
+            this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
+            this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
-        if (this.position.y === 13) {
-            this.sprite.body.collideWorldBounds = false;
-            if (this.position.x < 0) {
-                this.sprite.x = game.map.tilemap.widthInPixels - 1;
+            if (this.position.y === 13) {
+                this.sprite.body.collideWorldBounds = false;
+                if (this.position.x < 0) {
+                    this.sprite.x = game.map.tilemap.widthInPixels - 1;
+                }
+                if (this.position.x >= game.map.tilemap.width) {
+                    this.sprite.x = 1;
+                }
             }
-            if (this.position.x >= game.map.tilemap.width) {
-                this.sprite.x = 1;
+            else this.sprite.body.collideWorldBounds = true;
+
+            // Check which tiles are around us
+            this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
+            this.tiles_around[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
+            this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
+            this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
+
+            if (this.turning !== Phaser.NONE) {
+                this.turn();
+            }
+
+            this.checkKeys();
+        } 
+        else {
+            this.move(Phaser.NONE);
+            if(!this.isAnimatingDeath) {
+                this.sprite.play("death");
+                this.isAnimatingDeath = true;
             }
         }
-        else this.sprite.body.collideWorldBounds = true;
-
-        // Check which tiles are around us
-        this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
-        this.tiles_around[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
-        this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
-        this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
-
-        if (this.turning !== Phaser.NONE) {
-            this.turn();
-        }
-
-        this.checkKeys();
     }
 
     checkKeys() {
@@ -73,6 +85,7 @@ class Player {
             this.cursors.right.isDown ||
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
+            addTimer();
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }
 
@@ -186,5 +199,9 @@ class Player {
         game.map.numPills--;
 
         // Be able to eat ghost after
+    }
+
+    playAlone() {
+        console.log("test")
     }
 }

@@ -33,8 +33,6 @@ class Map {
         this.numPills = this.tilemap.createFromTiles(3, this.safetile, "lemon-tile", this.layer, this.pills);
 
         this.tilemap.setCollisionByExclusion([this.safetile], true, this.layer);
-
-        console.log(this.layer.layer)
         // this.layer.setScale(2,2);
     }
 }

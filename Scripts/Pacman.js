@@ -36,6 +36,7 @@ function create() {
     game.map = new Map('map');
     game.player = new Player();
 
+    addTimer();
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
 
@@ -44,4 +45,13 @@ function update() {
 }
 
 function render() {
+    // game.debug.text("Time until event: " + game.time.events.duration, 32, 32);
+}
+
+function addTimer() {
+    game.time.removeAll();
+
+    game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * 60, game.player.playAlone, this);
+
+    return;
 }
