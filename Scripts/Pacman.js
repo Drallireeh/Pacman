@@ -19,7 +19,7 @@ function preload() {
     Phaser.Canvas.setImageRenderingCrisp(game.canvas);
 
     game.tileSize = 16;
-
+    
     game.load.image('empty-tile', '../Assets/Images/empty-tile.jpg');
     game.load.image('wall', '../Assets/Images/wall.jpg');
     game.load.image('lemon-tile', '../Assets/Images/lemon.png');
@@ -31,11 +31,10 @@ function preload() {
 }
 
 function create() {
-    game.stage.backgroundColor = "#4488AA"; // temp
-
     game.map = new Map('map');
     game.player = new Player();
-
+    
+    game.scoreText = game.add.text(200, 100, 'Score : ' + game.player.score, {font: '18px arcade_normalregular', fill: '#ff0000'});
     addTimer();
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
@@ -45,13 +44,14 @@ function update() {
 }
 
 function render() {
+    document.getElementById("score").innerHTML = "Score : " + game.player.score;
     // game.debug.text("Time until event: " + game.time.events.duration, 32, 32);
 }
 
 function addTimer() {
     game.time.removeAll();
 
-    game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * 60, game.player.playAlone, this);
+    game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * 5, game.player.playAlone, this);
 
     return;
 }

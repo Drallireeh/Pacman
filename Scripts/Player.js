@@ -202,6 +202,6 @@ class Player {
     }
 
     playAlone() {
-        console.log("test")
+            console.log("test")
     }
 }
