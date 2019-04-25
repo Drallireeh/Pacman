@@ -10,7 +10,7 @@ class Player {
         this.isAnimatingDeath = false;
 
         this.tiles_around = [null, null, null, null, null];
-        this.directions = [Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP];
+        this.directions = [Phaser.NONE, Phaser.LEFT, Phaser.RIGHT, Phaser.UP, Phaser.DOWN];
 
         this.current = Phaser.NONE;
         this.turning = Phaser.NONE;
@@ -26,7 +26,7 @@ class Player {
         // Add pacman sprite, add 8 for anchor
         this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
         this.sprite.anchor.setTo(0.5);
-        this.sprite.animations.add('munch', [0, 1, 2, 1], 20, true);
+        this.sprite.animations.add('munch', [0, 1, 2, 1], 15, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
 
         game.physics.arcade.enable(this.sprite);
@@ -34,20 +34,24 @@ class Player {
         this.sprite.body.collideWorldBounds = true;
 
         this.sprite.play('munch');
-        this.move(Phaser.DOWN);
+        this.move(Phaser.LEFT);
 
         this.cursors = game.input.keyboard.createCursorKeys();
     }
 
     update() {
-        if (!this.isDead) {// Enable collisions
+        if (!this.isDead) {
+
+            // Enable collisions
             game.physics.arcade.collide(this.sprite, game.map.layer);
             game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
             game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
 
+            // set position with tiles position
             this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
             this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
+            // Where we can go from left to right side, maybe to remove later
             if (this.position.y === 13) {
                 this.sprite.body.collideWorldBounds = false;
                 if (this.position.x < 0) {
@@ -70,10 +74,10 @@ class Player {
             }
 
             this.checkKeys();
-        } 
+        }
         else {
             this.move(Phaser.NONE);
-            if(!this.isAnimatingDeath) {
+            if (!this.isAnimatingDeath) {
                 this.sprite.play("death");
                 this.isAnimatingDeath = true;
             }
@@ -85,7 +89,7 @@ class Player {
             this.cursors.right.isDown ||
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
-            addTimer();
+            addTimer(60);
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }
 
@@ -202,6 +206,49 @@ class Player {
     }
 
     playAlone() {
-            console.log("test")
+        let player = game.player;
+        switch (player.current) {
+            case Phaser.LEFT:
+                if (player.tiles_around[1] === null) {
+                    player.move(player.directions[player.getRandomDirection(player)]);
+                }
+                else return;
+                break;
+            case Phaser.RIGHT:
+                if (player.tiles_around[2] === null) {
+                    player.move(player.directions[player.getRandomDirection(player)]);
+                }
+                else return;
+                break;
+            case Phaser.UP:
+                if (player.tiles_around[3] === null) {
+                    let temp = getRandomInt(2, 4);
+                    if (temp === 3) temp = 1;
+                    player.move(player.directions[player.getRandomDirection(player)]);
+                }
+                else return;
+                break;
+            case Phaser.DOWN:
+                if (player.tiles_around[4] === null) {
+                    player.move(player.directions[player.getRandomDirection(player)]);
+                }
+                else return;
+                break;
+        }
+    }
+
+    getRandomDirection(player) {
+        let tempArray = player.directions.slice();
+        let index = player.tiles_around.indexOf(null, 1);
+        let idxArray = [];
+
+        while (index != -1) {
+            idxArray.push(index);
+            index = player.tiles_around.indexOf(null, index + 1);
+        }
+
+        for (let i = idxArray.length - 1; i >= 0; i--) tempArray.splice(idxArray[i], 1);
+
+        return tempArray[getRandomInt(1, tempArray.length - 1)];
     }
 }
