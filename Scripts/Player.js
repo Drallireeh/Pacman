@@ -19,12 +19,15 @@ class Player {
         this.keyPressTimer = 0;
         this.KEY_COOLING_DOWN_TIME = 750;
 
+        this.isPlaying = true;
         this.create();
     }
 
     create() {
         // Add pacman sprite, add 8 for anchor
+        // this.position.y = 6;
         this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
+        console.log(this.sprite)
         this.sprite.anchor.setTo(0.5);
         this.sprite.animations.add('munch', [0, 1, 2, 1], 15, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
@@ -74,6 +77,10 @@ class Player {
             }
 
             this.checkKeys();
+            if (!this.isPlaying)
+            {
+                this.playAlone();
+            }
         }
         else {
             this.move(Phaser.NONE);
@@ -90,6 +97,7 @@ class Player {
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
             addTimer(60);
+            this.isPlaying = true;
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }
 
@@ -134,11 +142,12 @@ class Player {
     }
 
     turn() {
+        console.log("TURN")
         let cx = Math.floor(this.sprite.x);
         let cy = Math.floor(this.sprite.y);
 
         //  This needs a threshold, because at high speeds you can't turn because the coordinates skip past
-        if (!game.math.fuzzyEqual(cx, this.turnPoint.x, 3) || !game.math.fuzzyEqual(cy, this.turnPoint.y, 3)) {
+        if (!game.math.fuzzyEqual(cx, this.turnPoint.x, 10) || !game.math.fuzzyEqual(cy, this.turnPoint.y, 10)) {
             return false;
         }
 
@@ -154,6 +163,7 @@ class Player {
     }
 
     move(direction) {
+        console.log(direction)
         if (direction === Phaser.NONE) {
             this.sprite.body.velocity.x = this.sprite.body.velocity.y = 0;
             return;
@@ -205,36 +215,42 @@ class Player {
         // Be able to eat ghost after
     }
 
+    switchToPlayAlone() {
+        game.player.isPlaying = false;
+    }
+
     playAlone() {
         let player = game.player;
         switch (player.current) {
             case Phaser.LEFT:
-                if (player.tiles_around[1] === null) {
-                    player.move(player.directions[player.getRandomDirection(player)]);
-                }
-                else return;
-                break;
+            if (player.tiles_around[1] === null || player.tiles_around[1].index !== game.map.safetile) {
+                player.checkDirection(player.getRandomDirection(player))
+                // player.turn();
+                // player.move(player.directions[player.getRandomDirection(player)]);
+            }
+            break;
             case Phaser.RIGHT:
-                if (player.tiles_around[2] === null) {
-                    player.move(player.directions[player.getRandomDirection(player)]);
-                }
-                else return;
-                break;
+            if (player.tiles_around[2] === null || player.tiles_around[2].index !== game.map.safetile) {
+                player.checkDirection(player.getRandomDirection(player))
+                // player.turn();
+                // player.move(player.directions[player.getRandomDirection(player)]);
+            }
+            break;
             case Phaser.UP:
-                if (player.tiles_around[3] === null) {
-                    let temp = getRandomInt(2, 4);
-                    if (temp === 3) temp = 1;
-                    player.move(player.directions[player.getRandomDirection(player)]);
-                }
-                else return;
-                break;
+            if (player.tiles_around[3] === null || player.tiles_around[3].index !== game.map.safetile) {
+                player.checkDirection(player.getRandomDirection(player))
+                // player.turn();
+                // player.move(player.directions[player.getRandomDirection(player)]);
+            }
+            break;
             case Phaser.DOWN:
-                if (player.tiles_around[4] === null) {
-                    player.move(player.directions[player.getRandomDirection(player)]);
-                }
-                else return;
-                break;
+            if (player.tiles_around[4] === null || player.tiles_around[4].index !== game.map.safetile) {
+                player.checkDirection(player.getRandomDirection(player))
+            }
+            break;
         }
+
+        return;
     }
 
     getRandomDirection(player) {

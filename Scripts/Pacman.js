@@ -34,7 +34,7 @@ function create() {
     game.map = new Map('map');
     game.player = new Player();
     
-    addTimer(5);
+    addTimer(60);
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
 
@@ -50,5 +50,5 @@ function render() {
 function addTimer(time) {
     game.time.removeAll();
 
-    game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * time, game.player.playAlone, this);
+    game.playingAlone = game.time.events.add(Phaser.Timer.SECOND * time, game.player.switchToPlayAlone, this);
 }
