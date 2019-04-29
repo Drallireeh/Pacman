@@ -83,10 +83,10 @@ function create() {
 
     game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
 
-    blinky = new Ghost("blinky", { x: 13, y: 11 }, Phaser.RIGHT);
-    pinky = new Ghost("pinky", { x: 15, y: 14 }, Phaser.LEFT);
-    inky = new Ghost("inky", { x: 14, y: 14 }, Phaser.RIGHT);
-    clyde = new Ghost("clyde", { x: 17, y: 14 }, Phaser.LEFT);
+    blinky = new Ghost("blinky", { x: 12, y: 10 }, Phaser.RIGHT);
+    pinky = new Ghost("pinky", { x: 14, y: 13 }, Phaser.LEFT);
+    inky = new Ghost("inky", { x: 13, y: 13 }, Phaser.RIGHT);
+    clyde = new Ghost("clyde", { x: 16, y: 13 }, Phaser.LEFT);
     game.ghosts.push(clyde, pinky, inky, blinky);
 
     addTimer(60);
