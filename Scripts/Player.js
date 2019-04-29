@@ -27,7 +27,6 @@ class Player {
     create() {
         // Add pacman sprite, add 8 for anchor
         this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
-        console.log(this.position)
         this.sprite.anchor.setTo(0.5);
         this.sprite.animations.add('munch', [0, 1, 2, 1], 15, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);

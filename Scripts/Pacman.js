@@ -29,7 +29,7 @@ function preload() {
     game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
     game.load.image('barrier', '../Assets/Images/barrier.png');
     game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16); // Version 16 pixels
-    game.load.spritesheet('ghosts', '../Assets/Images/ghosts32.png', 32, 32);
+    game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
     game.load.tilemap('map', '../Assets/tileMap.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -89,6 +89,8 @@ function create() {
     clyde = new Ghost("clyde", { x: 16, y: 13 }, Phaser.LEFT);
     game.ghosts.push(clyde, pinky, inky, blinky);
 
+    sendExitOrder(pinky);
+    
     addTimer(60);
     game.physics.startSystem(Phaser.Physics.ARCADE);
 }
@@ -214,7 +216,8 @@ function sendAttackOrder() {
 }
 
 function sendExitOrder(ghost) {
-    ghost.mode = clyde.EXIT_HOME;
+        console.log(ghost)
+        ghost.mode = clyde.EXIT_HOME;
 }
 
 function sendScatterOrder() {
