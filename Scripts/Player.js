@@ -11,6 +11,7 @@ class Player {
 
         this.tiles_around = [null, null, null, null, null];
         this.directions = [Phaser.NONE, Phaser.LEFT, Phaser.RIGHT, Phaser.UP, Phaser.DOWN];
+        this.opposites = [Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP];
 
         this.current = Phaser.NONE;
         this.turning = Phaser.NONE;
@@ -25,9 +26,8 @@ class Player {
 
     create() {
         // Add pacman sprite, add 8 for anchor
-        // this.position.y = 6;
         this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
-        console.log(this.sprite)
+        console.log(this.position)
         this.sprite.anchor.setTo(0.5);
         this.sprite.animations.add('munch', [0, 1, 2, 1], 15, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
@@ -77,8 +77,8 @@ class Player {
             }
 
             this.checkKeys();
-            if (!this.isPlaying)
-            {
+
+            if (!this.isPlaying) {
                 this.playAlone();
             }
         }
@@ -128,7 +128,7 @@ class Player {
             //  If the direction is already the same, if there is no tile available here --> return
             return;
         }
-        if (this.current === this.directions[turnTo]) {
+        if (this.current === this.opposites[turnTo]) {
             this.move(turnTo);
             this.keyPressTimer = game.time.time;
         }
@@ -142,7 +142,6 @@ class Player {
     }
 
     turn() {
-        console.log("TURN")
         let cx = Math.floor(this.sprite.x);
         let cy = Math.floor(this.sprite.y);
 
@@ -163,7 +162,6 @@ class Player {
     }
 
     move(direction) {
-        console.log(direction)
         if (direction === Phaser.NONE) {
             this.sprite.body.velocity.x = this.sprite.body.velocity.y = 0;
             return;
@@ -199,14 +197,14 @@ class Player {
         this.current = direction;
     }
 
-    eatDot(pacman, dot) {
+    eatDot(player, dot) {
         dot.kill();
 
         this.score += 10;
         game.map.numDots--;
     }
 
-    eatPill(pacman, pill) {
+    eatPill(player, pill) {
         pill.kill();
 
         this.score += 50;
@@ -223,34 +221,38 @@ class Player {
         let player = game.player;
         switch (player.current) {
             case Phaser.LEFT:
-            if (player.tiles_around[1] === null || player.tiles_around[1].index !== game.map.safetile) {
-                player.checkDirection(player.getRandomDirection(player))
-                // player.turn();
-                // player.move(player.directions[player.getRandomDirection(player)]);
-            }
-            break;
+                if (player.tiles_around[1] === null || player.tiles_around[1].index !== game.map.safetile) {
+                    player.checkDirection(player.getRandomDirection(player))
+                }
+                break;
             case Phaser.RIGHT:
-            if (player.tiles_around[2] === null || player.tiles_around[2].index !== game.map.safetile) {
-                player.checkDirection(player.getRandomDirection(player))
-                // player.turn();
-                // player.move(player.directions[player.getRandomDirection(player)]);
-            }
-            break;
+                if (player.tiles_around[2] === null || player.tiles_around[2].index !== game.map.safetile) {
+                    player.checkDirection(player.getRandomDirection(player))
+                }
+                break;
             case Phaser.UP:
-            if (player.tiles_around[3] === null || player.tiles_around[3].index !== game.map.safetile) {
-                player.checkDirection(player.getRandomDirection(player))
-                // player.turn();
-                // player.move(player.directions[player.getRandomDirection(player)]);
-            }
-            break;
+                if (player.tiles_around[3] === null || player.tiles_around[3].index !== game.map.safetile) {
+                    player.checkDirection(player.getRandomDirection(player))
+                }
+                break;
             case Phaser.DOWN:
-            if (player.tiles_around[4] === null || player.tiles_around[4].index !== game.map.safetile) {
-                player.checkDirection(player.getRandomDirection(player))
-            }
-            break;
+                if (player.tiles_around[4] === null || player.tiles_around[4].index !== game.map.safetile) {
+                    player.checkDirection(player.getRandomDirection(player))
+                }
+                break;
         }
 
         return;
+    }
+
+    die() {
+        this.isDead = true;
+        this.life--;
+
+        if (this.life < 0) gameOver();
+        else {
+            console.log("continue")
+        }
     }
 
     getRandomDirection(player) {
@@ -266,5 +268,13 @@ class Player {
         for (let i = idxArray.length - 1; i >= 0; i--) tempArray.splice(idxArray[i], 1);
 
         return tempArray[getRandomInt(1, tempArray.length - 1)];
+    }
+
+    getPosition() {
+        return new Phaser.Point((this.position.x * game.map.tileSize) + (game.map.tileSize / 2), (this.position.y * game.map.tileSize) + (game.map.tileSize / 2));
+    }
+
+    getCurrentDirection() {
+        return this.current;
     }
 }
