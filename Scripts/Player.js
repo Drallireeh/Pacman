@@ -208,6 +208,7 @@ class Player {
         this.score += 50;
         game.map.numPills--;
 
+        enterFrightenedMode();
         // Be able to eat ghost after
     }
 

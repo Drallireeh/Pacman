@@ -6,7 +6,7 @@ class Ghost {
 
         this.startDir = startDir;
         this.startPos = startPos;
-        this.threshold = 6;
+        this.threshold = 1;
 
         this.turnTimer = 0;
         this.TURNING_COOLDOWN = 100;
@@ -33,7 +33,7 @@ class Ghost {
 
         this.turnPoint = new Phaser.Point();
         this.lastPosition = { x: -1, y: -1 };
-        
+
         this.create();
     }
 
@@ -125,7 +125,7 @@ class Ghost {
 
         let x = game.math.snapToFloor(Math.floor(this.ghost.x), game.tileSize) / game.tileSize;
         let y = game.math.snapToFloor(Math.floor(this.ghost.y), game.tileSize) / game.tileSize;
-        
+
         if (this.ghost.y === 13) {
             this.ghost.body.collideWorldBounds = false;
             if (this.ghost.x < 0) {
@@ -135,17 +135,17 @@ class Ghost {
                 this.ghost.x = 1;
             }
         }
+        else this.ghost.body.collideWorldBounds = true;
+
 
         if (this.isAttacking && (this.mode === this.SCATTER || this.mode === this.CHASE)) {
             this.ghostDestination = this.getGhostDestination();
             this.mode = this.CHASE;
         }
-        
+
         if (game.math.fuzzyEqual((x * game.tileSize) + (game.tileSize / 2), this.ghost.x, this.threshold) &&
-        game.math.fuzzyEqual((y * game.tileSize) + (game.tileSize / 2),
+            game.math.fuzzyEqual((y * game.tileSize) + (game.tileSize / 2),
                 this.ghost.y, this.threshold)) {
-                    
-            if (this.name == "pinky") console.log("update")
 
             //  Update our grid sensors
             this.directions[0] = game.map.tilemap.getTile(x, y, game.map.layer);
@@ -163,6 +163,7 @@ class Ghost {
             }
             switch (this.mode) {
                 case this.RANDOM:
+                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (this.turnTimer < game.time.time && (possibleExits.length > 1 || !canContinue)) {
                         let select = Math.floor(Math.random() * possibleExits.length);
                         let newDirection = possibleExits[select];
@@ -183,6 +184,7 @@ class Ghost {
                     break;
 
                 case this.RETURNING_HOME:
+                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (this.turnTimer < game.time.time) {
                         this.ghost.body.reset(this.ghost.x, this.ghost.y);
                         if (this.flag = this.flag ? false : true) {
@@ -220,7 +222,8 @@ class Ghost {
                     break;
 
                 case this.CHASE:
-                    if (this.turnTimer < game.time.time) {
+                if (this.turnTimer < game.time.time) {
+                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                         let distanceToObj = 999999;
                         let direction, decision, bestDecision;
                         for (let i = 0; i < possibleExits.length; i++) {
@@ -251,11 +254,10 @@ class Ghost {
                                 distanceToObj = dist;
                             }
                         }
-                        //////////////////////////////////////////////////
+
                         if (isSpecialTile({ x: x, y: y }) && bestDecision === Phaser.UP) {
                             bestDecision = this.currentDir;
                         }
-                        //////////////////////////////////////////////////
 
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
@@ -274,6 +276,7 @@ class Ghost {
                     break;
 
                 case this.AT_HOME:
+                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (!canContinue) {
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (13 * game.tileSize) + (game.tileSize / 2);
@@ -288,7 +291,7 @@ class Ghost {
                     break;
 
                 case this.EXIT_HOME:
-                    if (this.name == "pinky") console.log(this.name, "is ", this.mode)
+                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (this.currentDir !== Phaser.UP && (x >= 12 || x <= 13)) {
                         if (this.name === "pinky") console.log(this.name, x, y, this.currentDir, canContinue)
                         this.turnPoint.x = (12 * game.tileSize) + (game.tileSize / 2);
@@ -322,6 +325,7 @@ class Ghost {
                     break;
 
                 case this.SCATTER:
+                    if (this.name == "blinky") console.log(this.name, this.mode)
                     this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
                     this.mode = this.CHASE;
                     break;
