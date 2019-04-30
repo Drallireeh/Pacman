@@ -3,7 +3,7 @@ class Player {
         this.score = 0;
         this.speed = 100;
         this.life = 2;
-        this.position = new Phaser.Point(13, 22);
+        this.position = new Phaser.Point(14, 23);
         this.turnPoint = new Phaser.Point();
 
         this.isDead = false;
@@ -19,6 +19,7 @@ class Player {
 
         this.keyPressTimer = 0;
         this.KEY_COOLING_DOWN_TIME = 750;
+        this.ghostEatenScore = 200;
 
         this.isPlaying = true;
         this.create();
@@ -33,7 +34,6 @@ class Player {
 
         game.physics.arcade.enable(this.sprite);
         this.sprite.body.setSize(game.tileSize, game.tileSize, 0, 0);
-        this.sprite.body.collideWorldBounds = true;
 
         this.sprite.play('munch');
         this.move(Phaser.LEFT);
@@ -53,16 +53,12 @@ class Player {
             this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
             // Where we can go from left to right side, maybe to remove later
-            if (this.position.y === 13) {
-                this.sprite.body.collideWorldBounds = false;
                 if (this.position.x < 0) {
                     this.sprite.x = game.map.tilemap.widthInPixels - 1;
                 }
                 if (this.position.x >= game.map.tilemap.width) {
                     this.sprite.x = 1;
                 }
-            }
-            else this.sprite.body.collideWorldBounds = true;
 
             // Check which tiles are around us
             this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
@@ -207,8 +203,20 @@ class Player {
 
         this.score += 50;
         game.map.numPills--;
+        this.resetGhostEatenScoring();
 
         enterFrightenedMode();
+    }
+
+    eatGhost() {
+        if (this.ghostEatenScore < 1600) {
+            this.ghostEatenScore *= 2;
+            this.score += this.ghostEatenScore;
+        }
+    }
+
+    resetGhostEatenScoring() {
+        this.ghostEatenScore = 200;
     }
 
     switchToPlayAlone() {

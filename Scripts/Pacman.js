@@ -1,6 +1,6 @@
 const game = new Phaser.Game(
-    416,
-    464,
+    448,
+    496,
     Phaser.AUTO,
     'game-root',
     {
@@ -21,15 +21,12 @@ function preload() {
     
     game.tileSize = 16;
     
-    game.load.image('empty-tile', '../Assets/Images/empty-tile.jpg');
-    game.load.image('wall', '../Assets/Images/wall.jpg');
-    game.load.image('lemon-tile', '../Assets/Images/lemon.png');
+    game.load.image('pill', '../Assets/Images/pill.png');
     game.load.image('dot', '../Assets/Images/dot.png');
     game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
-    game.load.image('barrier', '../Assets/Images/barrier.png');
     game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16); // Version 16 pixels
     game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
-    game.load.tilemap('map', '../Assets/tileMap.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', '../Assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
 function create() {
@@ -73,16 +70,16 @@ function create() {
     ];
 
     game.SPECIAL_TILES = [
-        { x: 11, y: 10 },
-        { x: 14, y: 10 },
-        { x: 11, y: 22 },
-        { x: 14, y: 22 }
+        { x: 12, y: 11 },
+        { x: 15, y: 11 },
+        { x: 12, y: 23 },
+        { x: 15, y: 23 }
     ];
 
     game.changeModeTimer = 0;
     game.remainingTime = 0;
     game.currentMode = 0;
-    game.isPaused = false;
+    game.isPlayerChasing = false;
     game.FRIGHTENED_MODE_TIME = 7000;
     game.isInkyOut = false;
     game.isClydeOut = false;
@@ -94,10 +91,10 @@ function create() {
 
     game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
 
-    game.blinky = new Ghost("blinky", { x: 12, y: 10 }, Phaser.RIGHT);
-    game.pinky = new Ghost("pinky", { x: 14, y: 13 }, Phaser.LEFT);
-    game.inky = new Ghost("inky", { x: 13, y: 13 }, Phaser.RIGHT);
-    game.clyde = new Ghost("clyde", { x: 16, y: 13 }, Phaser.LEFT);
+    game.blinky = new Ghost("blinky", { x: 13, y: 11 }, Phaser.RIGHT);
+    game.pinky = new Ghost("pinky", { x: 15, y: 14 }, Phaser.LEFT);
+    game.inky = new Ghost("inky", { x: 14, y: 14 }, Phaser.RIGHT);
+    game.clyde = new Ghost("clyde", { x: 17, y: 14 }, Phaser.LEFT);
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
     console.log(game.pinky)
@@ -124,7 +121,7 @@ function update() {
             sendExitOrder(game.clyde);
         }
 
-        if (game.changeModeTimer !== -1 && !game.isPaused && game.changeModeTimer < game.time.time) {
+        if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
             game.currentMode++;
             // console.log("DANS LE IF : " + game);
             // console.log("DANS LE IF : " + game.time);
@@ -141,9 +138,9 @@ function update() {
             }
             console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
         }
-        if (game.isPaused && game.changeModeTimer < game.time.time) {
+        if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
             game.changeModeTimer = game.time.time + game.remainingTime;
-            game.isPaused = false;
+            game.isPlayerChasing = false;
             if (game.TIME_MODES[game.currentMode].mode === "chase") {
                 sendAttackOrder();
             } else {
@@ -169,7 +166,7 @@ function addTimer(time) {
 }
 
 function getCurrentMode() {
-    if (!game.isPaused) {
+    if (!game.isPlayerChasing) {
         if (game.TIME_MODES[game.currentMode].mode === "scatter") {
             return "scatter";
         } else {
@@ -181,11 +178,11 @@ function getCurrentMode() {
 }
 
 function dogEatsDog(player, ghost) {
-    if (game.isPaused) {
+    if (game.isPlayerChasing) {
         game[ghost.name].mode = game[ghost.name].RETURNING_HOME;
-        game[ghost.name].ghostDestination = new Phaser.Point(13 * game.tileSize, 13 * game.tileSize);
+        game[ghost.name].ghostDestination = new Phaser.Point(14 * game.tileSize, 14 * game.tileSize);
         game[ghost.name].resetSafeTiles();
-        game.player.score += 10; // TO CHANGE
+        game.player.eatGhost();
     } else {
         game.player.die();
         stopGhosts();
@@ -193,7 +190,7 @@ function dogEatsDog(player, ghost) {
 }
 
 function getCurrentMode() {
-    if (!game.isPaused) {
+    if (!game.isPlayerChasing) {
         if (game.TIME_MODES[game.currentMode].mode === "scatter") {
             return "scatter";
         } else {
@@ -251,11 +248,11 @@ function enterFrightenedMode() {
     for (var i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].enterFrightenedMode();
     }
-    if (!game.isPaused) {
+    if (!game.isPlayerChasing) {
         game.remainingTime = game.changeModeTimer - game.time.time;
     }
     game.changeModeTimer = game.time.time + game.FRIGHTENED_MODE_TIME;
-    game.isPaused = true;
+    game.isPlayerChasing = true;
     console.log(game.remainingTime);
 }
 

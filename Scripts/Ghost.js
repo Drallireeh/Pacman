@@ -2,7 +2,7 @@ class Ghost {
     constructor(name, startPos, startDir) {
         this.name = name;
 
-        this.safetiles = [game.map.safetile, 2];
+        this.safetiles = [game.map.safetile, 35, 36];
 
         this.startDir = startDir;
         this.startPos = startPos;
@@ -126,16 +126,16 @@ class Ghost {
         let x = game.math.snapToFloor(Math.floor(this.ghost.x), game.tileSize) / game.tileSize;
         let y = game.math.snapToFloor(Math.floor(this.ghost.y), game.tileSize) / game.tileSize;
 
-        if (this.ghost.y === 13) {
-            this.ghost.body.collideWorldBounds = false;
+        // if (this.ghost.y === 13) {
+        //     this.ghost.body.collideWorldBounds = false;
             if (this.ghost.x < 0) {
                 this.ghost.x = game.map.tilemap.widthInPixels - 2;
             }
             if (this.ghost.x >= game.map.tilemap.widthInPixels - 1) {
                 this.ghost.x = 1;
             }
-        }
-        else this.ghost.body.collideWorldBounds = true;
+        // }
+        // else this.ghost.body.collideWorldBounds = true;
 
 
         if (this.isAttacking && (this.mode === this.SCATTER || this.mode === this.CHASE)) {
@@ -184,26 +184,25 @@ class Ghost {
                     break;
 
                 case this.RETURNING_HOME:
-                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (this.turnTimer < game.time.time) {
                         this.ghost.body.reset(this.ghost.x, this.ghost.y);
                         if (this.flag = this.flag ? false : true) {
                             this.ghost.body.velocity.x = 0;
-                            if (this.ghost.y < 13 * game.tileSize) {
+                            if (this.ghost.y < 14 * game.tileSize) {
                                 this.ghost.body.velocity.y = this.cruiseElroySpeed;
                                 this.ghost.animations.play(23);
                             }
-                            if (this.ghost.y > 14 * game.tileSize) {
+                            if (this.ghost.y > 15 * game.tileSize) {
                                 this.ghost.body.velocity.y = -this.cruiseElroySpeed;
                                 this.ghost.animations.play(22);
                             }
                         } else {
                             this.ghost.body.velocity.y = 0;
-                            if (this.ghost.x < 12 * game.tileSize) {
+                            if (this.ghost.x < 13 * game.tileSize) {
                                 this.ghost.body.velocity.x = this.cruiseElroySpeed;
                                 this.ghost.animations.play(20);
                             }
-                            if (this.ghost.x > 15 * game.tileSize) {
+                            if (this.ghost.x > 16 * game.tileSize) {
                                 this.ghost.body.velocity.x = -this.cruiseElroySpeed;
                                 this.ghost.animations.play(21);
                             }
@@ -279,7 +278,7 @@ class Ghost {
                     if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                     if (!canContinue) {
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (13 * game.tileSize) + (game.tileSize / 2);
+                        this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
                         this.ghost.y = this.turnPoint.y;
                         this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
@@ -291,10 +290,8 @@ class Ghost {
                     break;
 
                 case this.EXIT_HOME:
-                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
-                    if (this.currentDir !== Phaser.UP && (x >= 12 || x <= 13)) {
-                        if (this.name === "pinky") console.log(this.name, x, y, this.currentDir, canContinue)
-                        this.turnPoint.x = (12 * game.tileSize) + (game.tileSize / 2);
+                    if (this.currentDir !== Phaser.UP && (x >= 13 || x <= 14)) {
+                        this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
                         this.ghost.y = this.turnPoint.y;
@@ -302,8 +299,7 @@ class Ghost {
                         this.move(Phaser.UP);
                         if (this.name == "pinky") console.log(canContinue)
                     }
-                    else if (this.currentDir === Phaser.UP && y == 10) {
-                        if (this.name === "pinky") console.log(x, y, "second if")
+                    else if (this.currentDir === Phaser.UP && y == 11) {
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
@@ -313,7 +309,6 @@ class Ghost {
                         this.mode = getCurrentMode();
                         return;
                     } else if (!canContinue) {
-                        if (this.name === "pinky") console.log("cancontinue", this.name, this.currentDir, x, y)
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
@@ -338,7 +333,7 @@ class Ghost {
     }
 
     resetSafeTiles() {
-        this.safetiles = [game.map.safetile, 2];
+        this.safetiles = [game.map.safetile, 35, 36];
     }
 
     scatter() {
@@ -352,8 +347,8 @@ class Ghost {
     }
 
     hasReachedHome() {
-        if (this.ghost.x < 10 * game.tileSize || this.ghost.x > 15 * game.tileSize ||
-            this.ghost.y < 12 * game.tileSize || this.ghost.y > 14 * game.tileSize) {
+        if (this.ghost.x < 11 * game.tileSize || this.ghost.x > 16 * game.tileSize ||
+            this.ghost.y < 13 * game.tileSize || this.ghost.y > 15 * game.tileSize) {
             return false;
         }
         return true;
