@@ -270,7 +270,7 @@ class Player {
     }
 
     getPosition() {
-        return new Phaser.Point((this.position.x * game.map.tileSize) + (game.map.tileSize / 2), (this.position.y * game.map.tileSize) + (game.map.tileSize / 2));
+        return new Phaser.Point((this.position.x * game.tileSize) + (game.tileSize / 2), (this.position.y * game.tileSize) + (game.tileSize / 2));
     }
 
     getCurrentDirection() {

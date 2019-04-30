@@ -34,6 +34,8 @@ function preload() {
 }
 
 function create() {
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
     game.TIME_MODES = [
         {
             mode: "scatter",
@@ -68,6 +70,14 @@ function create() {
             time: -1 // -1 = infinite
         }
     ];
+
+    game.SPECIAL_TILES = [
+        { x: 11, y: 10 },
+        { x: 14, y: 10 },
+        { x: 11, y: 22 },
+        { x: 14, y: 22 }
+    ];
+
     game.changeModeTimer = 0;
     game.remainingTime = 0;
     game.currentMode = 0;
@@ -90,9 +100,8 @@ function create() {
     game.ghosts.push(clyde, pinky, inky, blinky);
 
     sendExitOrder(pinky);
-    
+
     addTimer(60);
-    game.physics.startSystem(Phaser.Physics.ARCADE);
 }
 
 function update() {
@@ -172,7 +181,7 @@ function getCurrentMode() {
 function dogEatsDog(player, ghost) {
     if (game.isPaused) {
         game[ghost.name].mode = game[ghost.name].RETURNING_HOME;
-        game[ghost.name].ghostDestination = new Phaser.Point(14 * game.tileSize, 14 * game.tileSize);
+        game[ghost.name].ghostDestination = new Phaser.Point(13 * game.tileSize, 13 * game.tileSize);
         game[ghost.name].resetSafeTiles();
         game.player.score += 10; // TO CHANGE
     } else {
@@ -200,6 +209,7 @@ function stopGhosts() {
 }
 
 function gimeMeExitOrder(ghost) {
+    console.log("GimeMeExitOrder")
     game.time.events.add(Math.random() * 3000, sendExitOrder, this, ghost);
 }
 
@@ -216,14 +226,23 @@ function sendAttackOrder() {
 }
 
 function sendExitOrder(ghost) {
-        console.log(ghost)
-        ghost.mode = clyde.EXIT_HOME;
+    console.log("send exit ", ghost)
+    ghost.mode = clyde.EXIT_HOME;
 }
 
 function sendScatterOrder() {
     for (var i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].scatter();
     }
+}
+
+function isSpecialTile(tile) {
+    for (var q = 0; q < game.SPECIAL_TILES.length; q++) {
+        if (tile.x === game.SPECIAL_TILES[q].x && tile.y === game.SPECIAL_TILES[q].y) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function enterFrightenedMode() {
