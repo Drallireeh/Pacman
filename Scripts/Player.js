@@ -144,7 +144,7 @@ class Player {
         let cy = Math.floor(this.sprite.y);
 
         //  This needs a threshold, because at high speeds you can't turn because the coordinates skip past
-        if (!game.math.fuzzyEqual(cx, this.turnPoint.x, 10) || !game.math.fuzzyEqual(cy, this.turnPoint.y, 10)) {
+        if (!game.math.fuzzyEqual(cx, this.turnPoint.x, 8) || !game.math.fuzzyEqual(cy, this.turnPoint.y, 8)) {
             return false;
         }
 
@@ -209,7 +209,6 @@ class Player {
         game.map.numPills--;
 
         enterFrightenedMode();
-        // Be able to eat ghost after
     }
 
     switchToPlayAlone() {

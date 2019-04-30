@@ -222,8 +222,8 @@ class Ghost {
                     break;
 
                 case this.CHASE:
-                if (this.turnTimer < game.time.time) {
-                    if (this.name == "blinky") console.log(this.name, "is ", this.mode)
+                    if (this.turnTimer < game.time.time) {
+                        if (this.name == "blinky") console.log(this.name, "is ", this.mode)
                         let distanceToObj = 999999;
                         let direction, decision, bestDecision;
                         for (let i = 0; i < possibleExits.length; i++) {
@@ -408,8 +408,6 @@ class Ghost {
             case "clyde":
                 pacmanPos = game.player.getPosition();
                 let clydePos = this.getPosition();
-                console.log(pacmanPos)
-                console.log(clydePos)
                 if (clydePos.distance(pacmanPos) > 8 * game.tileSize) {
                     return pacmanPos;
                 } else {
