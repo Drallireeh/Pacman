@@ -3,7 +3,7 @@ class Player {
         this.score = 0;
         this.speed = 100;
         this.life = 2;
-        this.position = new Phaser.Point();
+        this.position = new Phaser.Point(13, 22);
         this.turnPoint = new Phaser.Point();
 
         this.isDead = false;
@@ -43,7 +43,6 @@ class Player {
 
     update() {
         if (!this.isDead) {
-
             // Enable collisions
             game.physics.arcade.collide(this.sprite, game.map.layer);
             game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);

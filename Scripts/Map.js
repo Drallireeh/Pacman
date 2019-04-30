@@ -32,6 +32,9 @@ class Map {
         this.pills = game.add.physicsGroup();
         this.numPills = this.tilemap.createFromTiles(3, this.safetile, "lemon-tile", this.layer, this.pills);
 
+        this.barrier = game.add.physicsGroup();
+        this.barriers = this.tilemap.createFromTiles(2, 2, "barrier", this.layer, this.barrier)
+
         this.tilemap.setCollisionByExclusion([this.safetile], true, this.layer);
         // this.layer.setScale(2,2);
     }

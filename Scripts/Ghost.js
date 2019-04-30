@@ -33,7 +33,11 @@ class Ghost {
 
         this.turnPoint = new Phaser.Point();
         this.lastPosition = { x: -1, y: -1 };
+        
+        this.create();
+    }
 
+    create() {
         let offsetGhost = 0;
         switch (this.name) {
             case "clyde":
@@ -55,7 +59,7 @@ class Ghost {
                 break;
         }
 
-        this.ghost = game.add.sprite((startPos.x * 16) + 8, (startPos.y * 16) + 8, "ghosts", 0);
+        this.ghost = game.add.sprite((this.startPos.x * 16) + 8, (this.startPos.y * 16) + 8, "ghosts", 0);
         this.ghost.name = this.name;
         this.ghost.anchor.set(0.5);
         this.ghost.animations.add(Phaser.LEFT, [offsetGhost], 0, false);
@@ -68,21 +72,17 @@ class Ghost {
         this.ghost.animations.add(Phaser.UP + 20, [22], 0, false);
         this.ghost.animations.add(Phaser.DOWN + 20, [23], 0, false);
 
-        this.ghost.play(startDir);
+        this.ghost.play(this.startDir);
         game.physics.arcade.enable(this.ghost);
         this.ghost.body.setSize(16, 16, 0, 0);
         this.ghost.body.collideWorldBounds = true;
 
-        this.move(startDir);
-        // this.create();
-    }
-
-    create() {
-
+        this.move(this.startDir);
     }
 
     move(dir) {
         this.currentDir = dir;
+        // if (this.name == "blinky") console.log(dir)
 
         let speed = this.ghostSpeed;
         if (getCurrentMode() === this.SCATTER) {
@@ -112,7 +112,6 @@ class Ghost {
         }
 
         if (dir === Phaser.LEFT || dir === Phaser.RIGHT) {
-
             this.ghost.body.velocity.x = speed;
         } else {
             this.ghost.body.velocity.y = speed;
@@ -126,28 +125,27 @@ class Ghost {
 
         let x = game.math.snapToFloor(Math.floor(this.ghost.x), game.tileSize) / game.tileSize;
         let y = game.math.snapToFloor(Math.floor(this.ghost.y), game.tileSize) / game.tileSize;
-
-
-        if (this.ghost.y === 13) {
-                this.ghost.body.collideWorldBounds = false;
-                if (this.ghost.x < 0) {
-            this.ghost.x = game.map.tilemap.widthInPixels - 2;
-        }
-        if (this.ghost.x >= game.map.tilemap.widthInPixels - 1) {
-            this.ghost.x = 1;
-        }
         
-    }
+        if (this.ghost.y === 13) {
+            this.ghost.body.collideWorldBounds = false;
+            if (this.ghost.x < 0) {
+                this.ghost.x = game.map.tilemap.widthInPixels - 2;
+            }
+            if (this.ghost.x >= game.map.tilemap.widthInPixels - 1) {
+                this.ghost.x = 1;
+            }
+        }
 
         if (this.isAttacking && (this.mode === this.SCATTER || this.mode === this.CHASE)) {
             this.ghostDestination = this.getGhostDestination();
             this.mode = this.CHASE;
         }
-
+        
         if (game.math.fuzzyEqual((x * game.tileSize) + (game.tileSize / 2), this.ghost.x, this.threshold) &&
-            game.math.fuzzyEqual((y * game.tileSize) + (game.tileSize / 2),
+        game.math.fuzzyEqual((y * game.tileSize) + (game.tileSize / 2),
                 this.ghost.y, this.threshold)) {
-
+                    
+            if (this.name == "pinky") console.log("update")
 
             //  Update our grid sensors
             this.directions[0] = game.map.tilemap.getTile(x, y, game.map.layer);
@@ -161,7 +159,6 @@ class Ghost {
             for (let i = 1; i < this.directions.length; i++) {
                 if (this.checkSafetile(this.directions[i].index) && i !== this.opposites[this.currentDir]) {
                     possibleExits.push(i);
-                    // if (this.name == "blinky") console.log(possibleExits)
                 }
             }
             switch (this.mode) {
@@ -291,14 +288,19 @@ class Ghost {
                     break;
 
                 case this.EXIT_HOME:
+                    if (this.name == "pinky") console.log(this.name, "is ", this.mode)
                     if (this.currentDir !== Phaser.UP && (x >= 12 || x <= 13)) {
+                        if (this.name === "pinky") console.log(this.name, x, y, this.currentDir, canContinue)
                         this.turnPoint.x = (12 * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
                         this.ghost.y = this.turnPoint.y;
                         this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
                         this.move(Phaser.UP);
-                    } else if (this.currentDir === Phaser.UP && y == 10) {
+                        if (this.name == "pinky") console.log(canContinue)
+                    }
+                    else if (this.currentDir === Phaser.UP && y == 10) {
+                        if (this.name === "pinky") console.log(x, y, "second if")
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
@@ -308,6 +310,7 @@ class Ghost {
                         this.mode = getCurrentMode();
                         return;
                     } else if (!canContinue) {
+                        if (this.name === "pinky") console.log("cancontinue", this.name, this.currentDir, x, y)
                         this.turnPoint.x = (x * game.tileSize) + (game.tileSize / 2);
                         this.turnPoint.y = (y * game.tileSize) + (game.tileSize / 2);
                         this.ghost.x = this.turnPoint.x;
