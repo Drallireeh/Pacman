@@ -30,10 +30,6 @@ function preload() {
 }
 
 function create() {
-    game.pinky, game.blinky, game.inky, game.clyde = null;
-
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
     game.TIME_MODES = [
         {
             mode: "scatter",
@@ -75,19 +71,28 @@ function create() {
         { x: 12, y: 23 },
         { x: 15, y: 23 }
     ];
+    
+    game.FRIGHTENED_MODE_TIME = 7000;
+
+    game.map = new Map('map');
+    game.player = new Player();
+
+    startLevel();
+}
+
+function startLevel() {
+    game.pinky, game.blinky, game.inky, game.clyde = null;
+
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
     game.changeModeTimer = 0;
     game.remainingTime = 0;
     game.currentMode = 0;
     game.isPlayerChasing = false;
-    game.FRIGHTENED_MODE_TIME = 7000;
     game.isInkyOut = false;
     game.isClydeOut = false;
 
     game.ghosts = [];
-
-    game.map = new Map('map');
-    game.player = new Player();
 
     game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
 
@@ -99,7 +104,7 @@ function create() {
 
     sendExitOrder(game.pinky);
 
-    addTimer(60);
+    addNoPlayerTimer(60);
 }
 
 function update() {
@@ -159,7 +164,7 @@ function render() {
     // game.debug.text("Time until event: " + game.time.events.duration, 32, 32);
 }
 
-function addTimer(time) {
+function addNoPlayerTimer(time) {
     game.time.removeAll();
 
     game.time.events.add(Phaser.Timer.SECOND * time, game.player.switchToPlayAlone, this);
@@ -204,6 +209,12 @@ function getCurrentMode() {
 function stopGhosts() {
     for (var i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].mode = game.ghosts[i].STOP;
+    }
+}
+
+function resetGhosts() {
+    for (var i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].mode = game.ghosts[i].reset();
     }
 }
 

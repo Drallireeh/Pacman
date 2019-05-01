@@ -93,6 +93,8 @@ class Player {
         else {
             if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
                 this.respawn(this.score, this.lives);
+                resetGhosts();
+                startLevel();
             }
         }
     }
@@ -102,7 +104,7 @@ class Player {
             this.cursors.right.isDown ||
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
-            addTimer(60);
+            addNoPlayerTimer(60);
             this.isPlaying = true;
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }

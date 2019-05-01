@@ -440,4 +440,8 @@ class Ghost {
             this.isAttacking = false;
         }
     }
+
+    reset() {
+        this.ghost.destroy();
+    }
 }
