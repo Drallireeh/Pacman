@@ -1,8 +1,15 @@
 class Player {
     constructor() {
-        this.score = 0;
+        this.init();
+        this.create();
+    }
+
+    init(score = 0, lives = 2) {
+        this.score = score;
+        this.lives = lives;
+
         this.speed = 100;
-        this.lives = 2;
+
         this.position = new Phaser.Point(14, 23);
         this.turnPoint = new Phaser.Point();
 
@@ -22,6 +29,13 @@ class Player {
         this.ghostEatenScore = 200;
 
         this.isPlaying = true;
+    }
+
+    respawn(score, lives) {
+        this.sprite.body.destroy();
+        this.sprite.destroy();
+
+        this.init(score, lives);
         this.create();
     }
 
@@ -53,12 +67,12 @@ class Player {
             this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
             // Where we can go from left to right side, maybe to remove later
-                if (this.position.x < 0) {
-                    this.sprite.x = game.map.tilemap.widthInPixels - 1;
-                }
-                if (this.position.x >= game.map.tilemap.width) {
-                    this.sprite.x = 1;
-                }
+            if (this.position.x < 0) {
+                this.sprite.x = game.map.tilemap.widthInPixels - 1;
+            }
+            if (this.position.x >= game.map.tilemap.width) {
+                this.sprite.x = 1;
+            }
 
             // Check which tiles are around us
             this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
@@ -77,10 +91,8 @@ class Player {
             }
         }
         else {
-            this.move(Phaser.NONE);
-            if (!this.isAnimatingDeath) {
-                this.sprite.play("death");
-                this.isAnimatingDeath = true;
+            if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
+                this.respawn(this.score, this.lives);
             }
         }
     }
@@ -255,10 +267,14 @@ class Player {
         this.isDead = true;
         this.lives--;
 
-        if (this.lives < 0) gameOver();
-        else {
-            console.log("continue")
+        this.move(Phaser.NONE);
+
+        if (!this.isAnimatingDeath) {
+            this.sprite.play("death");
+            this.isAnimatingDeath = true;
         }
+
+        if (!this.hasLives) gameOver();
     }
 
     getRandomDirection(player) {
@@ -282,5 +298,9 @@ class Player {
 
     getCurrentDirection() {
         return this.current;
+    }
+
+    hasLives() {
+        return this.lives >= 0 ? true : false;
     }
 }
