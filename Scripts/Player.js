@@ -2,7 +2,7 @@ class Player {
     constructor() {
         this.score = 0;
         this.speed = 100;
-        this.life = 2;
+        this.lives = 2;
         this.position = new Phaser.Point(14, 23);
         this.turnPoint = new Phaser.Point();
 
@@ -253,9 +253,9 @@ class Player {
 
     die() {
         this.isDead = true;
-        this.life--;
+        this.lives--;
 
-        if (this.life < 0) gameOver();
+        if (this.lives < 0) gameOver();
         else {
             console.log("continue")
         }

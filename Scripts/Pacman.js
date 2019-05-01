@@ -97,7 +97,6 @@ function create() {
     game.clyde = new Ghost("clyde", { x: 17, y: 14 }, Phaser.LEFT);
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
-    console.log(game.pinky)
     sendExitOrder(game.pinky);
 
     addTimer(60);
@@ -156,6 +155,7 @@ function update() {
 
 function render() {
     document.getElementById("score").innerHTML = "Score : " + game.player.score;
+    document.getElementById("lives").innerHTML = "Lives : " + game.player.lives;
     // game.debug.text("Time until event: " + game.time.events.duration, 32, 32);
 }
 
@@ -208,7 +208,6 @@ function stopGhosts() {
 }
 
 function gimeMeExitOrder(ghost) {
-    console.log("GimeMeExitOrder")
     game.time.events.add(Math.random() * 3000, sendExitOrder, this, ghost);
 }
 
@@ -225,7 +224,6 @@ function sendAttackOrder() {
 }
 
 function sendExitOrder(ghost) {
-    console.log("send exit ", ghost)
     ghost.mode = game.clyde.EXIT_HOME;
 }
 

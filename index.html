@@ -26,15 +26,23 @@
         .text {
             color: #000000;
             background-color: white;
-            text-align: center;
+            display: flex;
+            flex-flow: row;
             font-size: 30px;
             font-family: arcade_normalregular;
+        }
+        .text :first-child {
+            padding-right : 100px;
         }
     </style>
 </head>
 
 <body>
-    <div id="score" class="text">Score : <br></div>
+    <div class="text">
+        <div id="score">Score : </div>
+        <div id="lives">Lives : </div>
+    </div>
+
     <div id="game-root"></div>
 
     <script src="Scripts/Libraries/phaser.min.js"></script>
