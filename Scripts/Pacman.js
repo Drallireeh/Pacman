@@ -73,6 +73,7 @@ function create() {
     ];
 
     game.FRIGHTENED_MODE_TIME = 7000;
+    game.level = 0;
 
     game.map = new Map('map');
     game.player = new Player();
@@ -113,6 +114,12 @@ function update() {
             if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
                 game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
             }
+        }
+
+        if (game.map.numDots === 0) {
+            game.level++;
+            game.player.move(Phaser.NONE);
+            stopGhosts();
         }
 
         if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {

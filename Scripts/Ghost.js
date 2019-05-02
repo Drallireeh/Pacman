@@ -20,9 +20,11 @@ class Ghost {
         this.RETURNING_HOME = "returning_home";
         this.isAttacking = false;
         this.isFrightened = false;
-
+        
         this.mode = this.AT_HOME;
         this.scatterDestination = new Phaser.Point((game.map.tilemap.width - 1) * game.tileSize, (game.map.tilemap.height - 1) * game.tileSize);
+        
+        this.limitCruiseElroy = 20;
 
         this.ghostSpeed = 100;
         this.ghostScatterSpeed = 75;
@@ -40,6 +42,8 @@ class Ghost {
     }
 
     create() {
+        this.adjustWithLevel(10);
+
         let offsetGhost = 0;
         switch (this.name) {
             case "clyde":
@@ -449,5 +453,13 @@ class Ghost {
 
     reset() {
         this.ghost.destroy();
+    }
+
+    adjustWithLevel(value) {
+        this.ghostSpeed += this.ghostSpeed * (game.level / value);
+        this.ghostFrightenedSpeed += this.ghostFrightenedSpeed * (game.level / value);
+        this.ghostScatterSpeed += this.ghostScatterSpeed * (game.level / value);
+        this.cruiseElroySpeed += this.cruiseElroySpeed * (game.level / value);
+        this.limitCruiseElroy += this.limitCruiseElroy * (game.level * (value / 2));
     }
 }
