@@ -71,17 +71,24 @@ function create() {
         { x: 12, y: 23 },
         { x: 15, y: 23 }
     ];
-
+    
     game.FRIGHTENED_MODE_TIME = 7000;
     game.level = 0;
+    game.launched = false;
+    
+    game.debug.font = "40px arcade_normalregular";
 
     game.map = new Map('map');
     game.player = new Player();
-
-    startLevel();
+    
+    game.timerStart = game.time.create();
+    game.timerStart.add(Phaser.Timer.SECOND * 3, startLevel, this);
+    game.timerStart.start();
 }
 
 function startLevel() {
+    game.player.create();
+
     game.pinky, game.blinky, game.inky, game.clyde = null;
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -109,71 +116,77 @@ function startLevel() {
 }
 
 function update() {
-    if (!game.player.isDead) {
-        for (let i = 0; i < game.ghosts.length; i++) {
-            if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
-                game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
-            }
-        }
-
-        if (game.map.numDots === 0) {
-            game.level++;
-            game.player.move(Phaser.NONE);
-            stopGhosts();
-        }
-
-        if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
+    if (!game.timerStart.running) {
+        if (!game.player.isDead) {
             for (let i = 0; i < game.ghosts.length; i++) {
-                if (game.ghosts[i].mode !== game.clyde.RETURNING_HOME) {
-                    game.ghosts[i].ghost.play("end frightened");
+                if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
+                    game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
                 }
             }
-        }
 
-        if (game.map.totalDots - game.map.numDots > 30 && !game.isInkyOut) {
-            game.isInkyOut = true;
-            sendExitOrder(game.inky);
-        }
-
-        if (game.map.numDots < game.map.totalDots / 3 && !game.isClydeOut) {
-            game.isClydeOut = true;
-            sendExitOrder(game.clyde);
-        }
-
-        if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
-            game.currentMode++;
-            // console.log("DANS LE IF : " + game);
-            // console.log("DANS LE IF : " + game.time);
-            // console.log("DANS LE IF : " + game.time.time);
-            // console.log(game.currentMode)///////////////////////////////////// ATTENTION
-            // console.log("DANS LE IF : " + game.TIME_MODES);
-            // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode]);
-            // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode].time);
-            game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
-            if (game.TIME_MODES[game.currentMode].mode === "chase") {
-                sendAttackOrder();
-            } else {
-                sendScatterOrder();
+            if (game.map.numDots === 0) {
+                game.level++;
+                game.player.move(Phaser.NONE);
+                stopGhosts();
             }
-            console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
-        }
-        if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
-            game.changeModeTimer = game.time.time + game.remainingTime;
-            game.isPlayerChasing = false;
-            if (game.TIME_MODES[game.currentMode].mode === "chase") {
-                sendAttackOrder();
-            } else {
-                sendScatterOrder();
+
+            if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
+                for (let i = 0; i < game.ghosts.length; i++) {
+                    if (game.ghosts[i].mode !== game.clyde.RETURNING_HOME) {
+                        game.ghosts[i].ghost.play("end frightened");
+                    }
+                }
             }
-            console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
+
+            if (game.map.totalDots - game.map.numDots > 30 && !game.isInkyOut) {
+                game.isInkyOut = true;
+                sendExitOrder(game.inky);
+            }
+
+            if (game.map.numDots < game.map.totalDots / 3 && !game.isClydeOut) {
+                game.isClydeOut = true;
+                sendExitOrder(game.clyde);
+            }
+
+            if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
+                game.currentMode++;
+                // console.log("DANS LE IF : " + game);
+                // console.log("DANS LE IF : " + game.time);
+                // console.log("DANS LE IF : " + game.time.time);
+                // console.log(game.currentMode)///////////////////////////////////// ATTENTION
+                // console.log("DANS LE IF : " + game.TIME_MODES);
+                // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode]);
+                // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode].time);
+                game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
+                if (game.TIME_MODES[game.currentMode].mode === "chase") {
+                    sendAttackOrder();
+                } else {
+                    sendScatterOrder();
+                }
+                console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
+            }
+            if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
+                game.changeModeTimer = game.time.time + game.remainingTime;
+                game.isPlayerChasing = false;
+                if (game.TIME_MODES[game.currentMode].mode === "chase") {
+                    sendAttackOrder();
+                } else {
+                    sendScatterOrder();
+                }
+                console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
+            }
         }
+
+        game.player.update();
+        updateGhosts();
     }
-
-    game.player.update();
-    updateGhosts();
 }
 
 function render() {
+    if (game.timerStart.running) game.debug.text(game.timerStart.duration / 1000, 200, 200);
+    else {
+        game.debug.text();
+    }
     document.getElementById("score").innerHTML = "Score : " + game.player.score;
     document.getElementById("lives").innerHTML = "Lives : " + game.player.lives;
 }

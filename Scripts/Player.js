@@ -1,7 +1,6 @@
 class Player {
     constructor() {
         this.init();
-        this.create();
     }
 
     init(score = 0, lives = 2) {
@@ -27,7 +26,7 @@ class Player {
         this.keyPressTimer = 0;
         this.KEY_COOLING_DOWN_TIME = 750;
         this.ghostEatenScore = 200;
-        
+
         this.isPlaying = true;
     }
 

@@ -20,10 +20,10 @@ class Ghost {
         this.RETURNING_HOME = "returning_home";
         this.isAttacking = false;
         this.isFrightened = false;
-        
+
         this.mode = this.AT_HOME;
         this.scatterDestination = new Phaser.Point((game.map.tilemap.width - 1) * game.tileSize, (game.map.tilemap.height - 1) * game.tileSize);
-        
+
         this.limitCruiseElroy = 20;
 
         this.ghostSpeed = 100;
