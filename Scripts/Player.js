@@ -35,7 +35,7 @@ class Player {
         this.sprite.destroy();
 
         this.init(score, lives);
-        this.create();
+        // this.create();
     }
 
     create() {
@@ -93,7 +93,7 @@ class Player {
             if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
                 this.respawn(this.score, this.lives);
                 resetGhosts();
-                startLevel();
+                addStarterTimer();
             }
         }
     }

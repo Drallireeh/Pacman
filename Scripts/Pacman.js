@@ -81,7 +81,12 @@ function create() {
     game.map = new Map('map');
     game.player = new Player();
     
+    addStarterTimer();
+}
+
+function addStarterTimer() {
     game.timerStart = game.time.create();
+    game.timerStart.removeAll();
     game.timerStart.add(Phaser.Timer.SECOND * 3, startLevel, this);
     game.timerStart.start();
 }
@@ -117,6 +122,7 @@ function startLevel() {
 
 function update() {
     if (!game.timerStart.running) {
+        game.timerStart.removeAll();
         if (!game.player.isDead) {
             for (let i = 0; i < game.ghosts.length; i++) {
                 if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
