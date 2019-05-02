@@ -27,7 +27,7 @@ class Player {
         this.keyPressTimer = 0;
         this.KEY_COOLING_DOWN_TIME = 750;
         this.ghostEatenScore = 200;
-
+        
         this.isPlaying = true;
     }
 

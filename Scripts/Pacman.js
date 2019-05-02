@@ -16,11 +16,11 @@ function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignVertically = true;
-    
+
     Phaser.Canvas.setImageRenderingCrisp(game.canvas);
-    
+
     game.tileSize = 16;
-    
+
     game.load.image('pill', '../Assets/Images/pill.png');
     game.load.image('dot', '../Assets/Images/dot.png');
     game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
@@ -71,7 +71,7 @@ function create() {
         { x: 12, y: 23 },
         { x: 15, y: 23 }
     ];
-    
+
     game.FRIGHTENED_MODE_TIME = 7000;
 
     game.map = new Map('map');
@@ -109,9 +109,17 @@ function startLevel() {
 
 function update() {
     if (!game.player.isDead) {
-        for (var i = 0; i < game.ghosts.length; i++) {
+        for (let i = 0; i < game.ghosts.length; i++) {
             if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
                 game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
+            }
+        }
+
+        if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
+            for (let i = 0; i < game.ghosts.length; i++) {
+                if (game.ghosts[i].mode !== game.clyde.RETURNING_HOME) {
+                    game.ghosts[i].ghost.play("end frightened");
+                }
             }
         }
 
@@ -161,7 +169,6 @@ function update() {
 function render() {
     document.getElementById("score").innerHTML = "Score : " + game.player.score;
     document.getElementById("lives").innerHTML = "Lives : " + game.player.lives;
-    // game.debug.text("Time until event: " + game.time.events.duration, 32, 32);
 }
 
 function addNoPlayerTimer(time) {
@@ -187,6 +194,7 @@ function dogEatsDog(player, ghost) {
     if (game.isPlayerChasing) {
         game[ghost.name].mode = game[ghost.name].RETURNING_HOME;
         game[ghost.name].ghostDestination = new Phaser.Point(14 * game.tileSize, 14 * game.tileSize);
+        game[ghost.name].gotEat();
         game[ghost.name].resetSafeTiles();
         game.player.eatGhost();
     } else {
@@ -208,13 +216,13 @@ function getCurrentMode() {
 }
 
 function stopGhosts() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].mode = game.ghosts[i].STOP;
     }
 }
 
 function resetGhosts() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].mode = game.ghosts[i].reset();
     }
 }
@@ -224,13 +232,14 @@ function gimeMeExitOrder(ghost) {
 }
 
 function updateGhosts() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].update();
     }
 }
 
 function sendAttackOrder() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].exitFrightenedMode();
         game.ghosts[i].attack();
     }
 }
@@ -240,13 +249,14 @@ function sendExitOrder(ghost) {
 }
 
 function sendScatterOrder() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].exitFrightenedMode();
         game.ghosts[i].scatter();
     }
 }
 
 function isSpecialTile(tile) {
-    for (var q = 0; q < game.SPECIAL_TILES.length; q++) {
+    for (let q = 0; q < game.SPECIAL_TILES.length; q++) {
         if (tile.x === game.SPECIAL_TILES[q].x && tile.y === game.SPECIAL_TILES[q].y) {
             return true;
         }
@@ -255,7 +265,7 @@ function isSpecialTile(tile) {
 }
 
 function enterFrightenedMode() {
-    for (var i = 0; i < game.ghosts.length; i++) {
+    for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].enterFrightenedMode();
     }
     if (!game.isPlayerChasing) {
@@ -263,7 +273,6 @@ function enterFrightenedMode() {
     }
     game.changeModeTimer = game.time.time + game.FRIGHTENED_MODE_TIME;
     game.isPlayerChasing = true;
-    console.log(game.remainingTime);
 }
 
 function gameOver() {
