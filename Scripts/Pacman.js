@@ -183,6 +183,7 @@ function getCurrentMode() {
 }
 
 function dogEatsDog(player, ghost) {
+    // if (game.player.isAdjacentToAnyGhost(ghost)) console.log("ADJACENT")
     if (game.isPlayerChasing) {
         game[ghost.name].mode = game[ghost.name].RETURNING_HOME;
         game[ghost.name].ghostDestination = new Phaser.Point(14 * game.tileSize, 14 * game.tileSize);

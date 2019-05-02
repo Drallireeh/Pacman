@@ -305,4 +305,15 @@ class Player {
     hasLives() {
         return this.lives >= 0 ? true : false;
     }
+
+    /////////// See later if it's really needed //////////////
+    // isAdjacentToAnyGhost(ghost) {
+    //     let xDiff = this.sprite.position.x - ghost.position.x;
+    //     let yDiff = this.sprite.position.y - ghost.position.y;
+    //     console.log(xDiff, yDiff)
+
+    //     if (((xDiff <= 20 && xDiff >= -20) && yDiff === 0) || ((yDiff <= 20 && yDiff >= -20) && xDiff === 0)) return true
+    //     else return false
+    // }
+    /////////////////////////////////////////////////////////
 }
