@@ -86,43 +86,6 @@ class Ghost {
         this.move(this.startDir);
     }
 
-    move(dir) {
-        this.currentDir = dir;
-        // if (this.name == "blinky") console.log(dir)
-
-        let speed = this.ghostSpeed;
-        if (getCurrentMode() === this.SCATTER) {
-            speed = this.ghostScatterSpeed;
-        }
-
-        if (this.mode === this.RANDOM) {
-            speed = this.ghostFrightenedSpeed;
-        } else if (this.mode === this.RETURNING_HOME) {
-            speed = this.cruiseElroySpeed;
-            if (!this.isFrightened) this.ghost.animations.play(dir + 20);
-        } else {
-            if (!this.isFrightened) this.ghost.animations.play(dir);
-            if (this.name === "blinky" && game.map.numDots < 20) {
-                speed = this.cruiseElroySpeed;
-                this.mode = this.CHASE;
-            }
-        }
-
-        if (this.currentDir === Phaser.NONE) {
-            this.ghost.body.velocity.x = this.ghost.body.velocity.y = 0;
-            return;
-        }
-
-        if (dir === Phaser.LEFT || dir === Phaser.UP) {
-            speed = -speed;
-        }
-
-        if (dir === Phaser.LEFT || dir === Phaser.RIGHT) {
-            this.ghost.body.velocity.x = speed;
-        } else {
-            this.ghost.body.velocity.y = speed;
-        }
-    }
 
     update() {
         if (this.mode !== this.RETURNING_HOME) {
@@ -329,39 +292,50 @@ class Ghost {
         }
     }
 
-    resetSafeTiles() {
-        this.safetiles = [game.map.safetile, 35, 36];
-    }
+    /**
+     * Send order to move with direction
+     * @param {number} dir Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, ....
+     */
+    move(dir) {
+        this.currentDir = dir;
 
-    gotEat() {
-        this.isFrightened = false;
-        this.ghost.animations.currentAnim.stop();
-    }
+        let speed = this.ghostSpeed;
+        if (getCurrentMode() === this.SCATTER) {
+            speed = this.ghostScatterSpeed;
+        }
 
-    scatter() {
-        if (this.mode !== this.RETURNING_HOME) {
-            if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
-            this.isAttacking = false;
-            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
-                this.mode = this.SCATTER;
+        if (this.mode === this.RANDOM) {
+            speed = this.ghostFrightenedSpeed;
+        } else if (this.mode === this.RETURNING_HOME) {
+            speed = this.cruiseElroySpeed;
+            if (!this.isFrightened) this.ghost.animations.play(dir + 20);
+        } else {
+            if (!this.isFrightened) this.ghost.animations.play(dir);
+            if (this.name === "blinky" && game.map.numDots < this.limitCruiseElroy) {
+                speed = this.cruiseElroySpeed;
+                this.mode = this.CHASE;
             }
         }
-    }
 
-    hasReachedHome() {
-        if (this.ghost.x < 11 * game.tileSize || this.ghost.x > 16 * game.tileSize ||
-            this.ghost.y < 13 * game.tileSize || this.ghost.y > 15 * game.tileSize) {
-            return false;
+        if (this.currentDir === Phaser.NONE) {
+            this.ghost.body.velocity.x = this.ghost.body.velocity.y = 0;
+            return;
         }
-        return true;
+
+        if (dir === Phaser.LEFT || dir === Phaser.UP) {
+            speed = -speed;
+        }
+
+        if (dir === Phaser.LEFT || dir === Phaser.RIGHT) {
+            this.ghost.body.velocity.x = speed;
+        } else {
+            this.ghost.body.velocity.y = speed;
+        }
     }
 
-    getPosition() {
-        let x = game.math.snapToFloor(Math.floor(this.ghost.x), game.tileSize) / game.tileSize;
-        let y = game.math.snapToFloor(Math.floor(this.ghost.y), game.tileSize) / game.tileSize;
-        return new Phaser.Point((x * game.tileSize) + (game.tileSize / 2), (y * game.tileSize) + (game.tileSize / 2));
-    }
-
+    /**
+         * Obtain ghost destination. Each destination is different.
+         */
     getGhostDestination() {
         let dest, pacmanPos;
         switch (this.name) {
@@ -416,6 +390,53 @@ class Ghost {
         }
     }
 
+    /**
+     * called when ghost is eaten
+     */
+    gotEat() {
+        this.exitFrightenedMode();
+    }
+
+    /**
+     * Verify the next tile in our direction 
+     * @param {Array} tileIndex tiles where ghost can move
+     */
+    checkSafetile(tileIndex) {
+        for (let q = 0; q < this.safetiles.length; q++) {
+            if (this.safetiles[q] == tileIndex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * return true if this ghost is at home
+     */
+    hasReachedHome() {
+        if (this.ghost.x < 11 * game.tileSize || this.ghost.x > 16 * game.tileSize ||
+            this.ghost.y < 13 * game.tileSize || this.ghost.y > 15 * game.tileSize) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Set scatter mode
+     */
+    scatter() {
+        if (this.mode !== this.RETURNING_HOME) {
+            if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
+            this.isAttacking = false;
+            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
+                this.mode = this.SCATTER;
+            }
+        }
+    }
+
+    /**
+     * Set attack mode
+     */
     attack() {
         if (this.mode !== this.RETURNING_HOME) {
             this.isAttacking = true;
@@ -426,15 +447,9 @@ class Ghost {
         }
     }
 
-    checkSafetile(tileIndex) {
-        for (let q = 0; q < this.safetiles.length; q++) {
-            if (this.safetiles[q] == tileIndex) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    /**
+     * Set Frightened mode
+     */
     enterFrightenedMode() {
         if (this.mode !== this.RETURNING_HOME) {
             this.ghost.play("begin frightened");
@@ -446,20 +461,48 @@ class Ghost {
         }
     }
 
+    /**
+     * Reset animation, and set frightened boolean to false
+     */
     exitFrightenedMode() {
         this.isFrightened = false;
         this.ghost.animations.currentAnim.stop();
     }
 
-    reset() {
-        this.ghost.destroy();
+
+
+    /**
+     * return ghost position
+     */
+    getPosition() {
+        let x = game.math.snapToFloor(Math.floor(this.ghost.x), game.tileSize) / game.tileSize;
+        let y = game.math.snapToFloor(Math.floor(this.ghost.y), game.tileSize) / game.tileSize;
+        return new Phaser.Point((x * game.tileSize) + (game.tileSize / 2), (y * game.tileSize) + (game.tileSize / 2));
     }
 
-    adjustWithLevel(value) {
+    /**
+     * Adjust ghost speeds and limit of cruise elroy mode for blinky with the amount of level.
+     * @param {number} value Less than 10 and the game become more easier, more than 10 harder
+     */
+    adjustWithLevel(value = 10) {
         this.ghostSpeed += this.ghostSpeed * (game.level / value);
         this.ghostFrightenedSpeed += this.ghostFrightenedSpeed * (game.level / value);
         this.ghostScatterSpeed += this.ghostScatterSpeed * (game.level / value);
         this.cruiseElroySpeed += this.cruiseElroySpeed * (game.level / value);
         this.limitCruiseElroy += this.limitCruiseElroy * (game.level * (value / 2));
+    }
+
+    /**
+     * When they return home, need to reset safetiles
+     */
+    resetSafeTiles() {
+        this.safetiles = [game.map.safetile, 35, 36];
+    }
+
+    /**
+     * Destroy this ghost
+     */
+    reset() {
+        this.ghost.destroy();
     }
 }
