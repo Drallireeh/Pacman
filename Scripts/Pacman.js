@@ -71,16 +71,16 @@ function create() {
         { x: 12, y: 23 },
         { x: 15, y: 23 }
     ];
-    
+
     game.FRIGHTENED_MODE_TIME = 7000;
     game.level = 0;
     game.launched = false;
-    
+
     game.debug.font = "40px arcade_normalregular";
 
     game.map = new Map('map');
     game.player = new Player();
-    
+
     addStarterTimer();
 }
 
@@ -155,7 +155,7 @@ function update() {
             }
 
             if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
-                game.currentMode++;
+                if (game.currentMode < 7) game.currentMode++;
                 // console.log("DANS LE IF : " + game);
                 // console.log("DANS LE IF : " + game.time);
                 // console.log("DANS LE IF : " + game.time.time);
@@ -189,7 +189,7 @@ function update() {
 }
 
 function render() {
-    if (game.timerStart.running) game.debug.text(game.timerStart.duration / 1000, 200, 200);
+    if (game.timerStart.running) game.debug.text(game.timerStart.duration / 1000, game.world.centerX - 100, game.world.centerY);
     else {
         game.debug.text();
     }
