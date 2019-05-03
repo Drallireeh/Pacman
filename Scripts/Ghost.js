@@ -102,22 +102,15 @@ class Ghost {
             this.ghost.x = 1;
         }
 
-
         if (this.isAttacking && (this.mode === this.SCATTER || this.mode === this.CHASE)) {
             this.ghostDestination = this.getGhostDestination();
             this.mode = this.CHASE;
         }
 
         if (game.math.fuzzyEqual((this.position.x * game.tileSize) + (game.tileSize / 2), this.ghost.x, this.threshold) &&
-            game.math.fuzzyEqual((this.position.y * game.tileSize) + (game.tileSize / 2),
-                this.ghost.y, this.threshold)) {
+            game.math.fuzzyEqual((this.position.y * game.tileSize) + (game.tileSize / 2), this.ghost.y, this.threshold)) {
 
-            //  Update our grid sensors
-            this.directions[0] = game.map.tilemap.getTile(this.position.x, this.position.y, game.map.layer);
-            this.directions[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y) || this.directions[1];
-            this.directions[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y) || this.directions[2];
-            this.directions[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y) || this.directions[3];
-            this.directions[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y) || this.directions[4];
+            this.updateGridSensors();
 
             let canContinue = this.checkSafetile(this.directions[this.currentDir].index);
             let possibleExits = [];
@@ -128,156 +121,23 @@ class Ghost {
             }
             switch (this.mode) {
                 case this.RANDOM:
-                    if (this.turnTimer < game.time.time && (possibleExits.length > 1 || !canContinue)) {
-                        let select = Math.floor(Math.random() * possibleExits.length);
-                        let newDirection = possibleExits[select];
-
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-
-                        // snap to grid exact position before turning
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-
-                        this.lastPosition = { x: this.position.x, y: this.position.y };
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        this.move(newDirection);
-
-                        this.turnTimer = game.time.time + this.TURNING_COOLDOWN;
-                    }
+                    this.whileInRandomMode(possibleExits, canContinue);
                     break;
 
                 case this.RETURNING_HOME:
-                    if (this.turnTimer < game.time.time) {
-                        this.ghost.body.reset(this.ghost.x, this.ghost.y);
-                        if (this.flag = this.flag ? false : true) {
-                            this.ghost.body.velocity.x = 0;
-                            if (this.ghost.y < 14 * game.tileSize) {
-                                this.ghost.body.velocity.y = this.cruiseElroySpeed;
-                                this.ghost.animations.play(23);
-                            }
-                            if (this.ghost.y > 15 * game.tileSize) {
-                                this.ghost.body.velocity.y = -this.cruiseElroySpeed;
-                                this.ghost.animations.play(22);
-                            }
-                        } else {
-                            this.ghost.body.velocity.y = 0;
-                            if (this.ghost.x < 13 * game.tileSize) {
-                                this.ghost.body.velocity.x = this.cruiseElroySpeed;
-                                this.ghost.animations.play(20);
-                            }
-                            if (this.ghost.x > 16 * game.tileSize) {
-                                this.ghost.body.velocity.x = -this.cruiseElroySpeed;
-                                this.ghost.animations.play(21);
-                            }
-                        }
-                        this.turnTimer = game.time.time + this.RETURNING_COOLDOWN;
-                    }
-                    if (this.hasReachedHome()) {
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        this.mode = this.AT_HOME;
-                        sendExitOrder(this);
-                    }
+                    this.whileReturningHome();
                     break;
 
                 case this.CHASE:
-                    if (this.turnTimer < game.time.time) {
-                        let distanceToObj = 999999;
-                        let direction, decision, bestDecision;
-                        for (let i = 0; i < possibleExits.length; i++) {
-                            direction = possibleExits[i];
-                            switch (direction) {
-                                case Phaser.LEFT:
-                                    decision = new Phaser.Point((this.position.x - 1) * game.tileSize + (game.tileSize / 2),
-                                        (this.position.y * game.tileSize) + (game.tileSize / 2));
-                                    break;
-                                case Phaser.RIGHT:
-                                    decision = new Phaser.Point((this.position.x + 1) * game.tileSize + (game.tileSize / 2),
-                                        (this.position.y * game.tileSize) + (game.tileSize / 2));
-                                    break;
-                                case Phaser.UP:
-                                    decision = new Phaser.Point(this.position.x * game.tileSize + (game.tileSize / 2),
-                                        ((this.position.y - 1) * game.tileSize) + (game.tileSize / 2));
-                                    break;
-                                case Phaser.DOWN:
-                                    decision = new Phaser.Point(this.position.x * game.tileSize + (game.tileSize / 2),
-                                        ((this.position.y + 1) * game.tileSize) + (game.tileSize / 2));
-                                    break;
-                                default:
-                                    break;
-                            }
-                            let dist = this.ghostDestination.distance(decision);
-                            if (dist < distanceToObj) {
-                                bestDecision = direction;
-                                distanceToObj = dist;
-                            }
-                        }
-
-                        if (isSpecialTile({ x: this.position.x, y: this.position.y }) && bestDecision === Phaser.UP) {
-                            bestDecision = this.currentDir;
-                        }
-
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-
-                        // snap to grid exact position before turning
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-
-                        this.lastPosition = { x: this.position.x, y: this.position.y };
-
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        this.move(bestDecision);
-
-                        this.turnTimer = game.time.time + this.TURNING_COOLDOWN;
-                    }
+                    this.whileChasing(possibleExits);
                     break;
 
                 case this.AT_HOME:
-                    if (!canContinue) {
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
-                        this.move(dir);
-                    } else {
-                        this.move(this.currentDir);
-                    }
+                    this.whileAtHome(canContinue);
                     break;
 
                 case this.EXIT_HOME:
-                    if (this.currentDir !== Phaser.UP && (this.position.x >= 13 || this.position.x <= 14)) {
-                        this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        this.move(Phaser.UP);
-                    }
-                    else if (this.currentDir === Phaser.UP && this.position.y == 11) {
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        this.safetiles = [game.map.safetile];
-                        this.mode = getCurrentMode();
-                        return;
-                    } else if (!canContinue) {
-                        this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
-                        this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-                        this.ghost.x = this.turnPoint.x;
-                        this.ghost.y = this.turnPoint.y;
-                        this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-                        let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
-                        this.move(dir);
-                    }
+                    this.whileExitHome(canContinue);
                     break;
 
                 case this.SCATTER:
@@ -333,9 +193,170 @@ class Ghost {
         }
     }
 
+    updateGridSensors() {
+        this.directions[0] = game.map.tilemap.getTile(this.position.x, this.position.y, game.map.layer);
+        this.directions[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y) || this.directions[1];
+        this.directions[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y) || this.directions[2];
+        this.directions[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y) || this.directions[3];
+        this.directions[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y) || this.directions[4];
+    }
+
+    whileInRandomMode(possibleExits, canContinue) {
+        if (this.turnTimer < game.time.time && (possibleExits.length > 1 || !canContinue)) {
+            let select = Math.floor(Math.random() * possibleExits.length);
+            let newDirection = possibleExits[select];
+
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+
+            // snap to grid exact position before turning
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+
+            this.lastPosition = { x: this.position.x, y: this.position.y };
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.move(newDirection);
+
+            this.turnTimer = game.time.time + this.TURNING_COOLDOWN;
+        }
+    }
+
+    whileReturningHome() {
+        if (this.turnTimer < game.time.time) {
+            this.ghost.body.reset(this.ghost.x, this.ghost.y);
+            if (this.flag = this.flag ? false : true) {
+                this.ghost.body.velocity.x = 0;
+                if (this.ghost.y < 14 * game.tileSize) {
+                    this.ghost.body.velocity.y = this.cruiseElroySpeed;
+                    this.ghost.animations.play(23);
+                }
+                if (this.ghost.y > 15 * game.tileSize) {
+                    this.ghost.body.velocity.y = -this.cruiseElroySpeed;
+                    this.ghost.animations.play(22);
+                }
+            } else {
+                this.ghost.body.velocity.y = 0;
+                if (this.ghost.x < 13 * game.tileSize) {
+                    this.ghost.body.velocity.x = this.cruiseElroySpeed;
+                    this.ghost.animations.play(20);
+                }
+                if (this.ghost.x > 16 * game.tileSize) {
+                    this.ghost.body.velocity.x = -this.cruiseElroySpeed;
+                    this.ghost.animations.play(21);
+                }
+            }
+            this.turnTimer = game.time.time + this.RETURNING_COOLDOWN;
+        }
+        if (this.hasReachedHome()) {
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.mode = this.AT_HOME;
+            sendExitOrder(this);
+        }
+    }
+
+    whileExitHome(canContinue) {
+        if (this.currentDir !== Phaser.UP && (this.position.x >= 13 || this.position.x <= 14)) {
+            this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.move(Phaser.UP);
+        }
+        else if (this.currentDir === Phaser.UP && this.position.y == 11) {
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.safetiles = [game.map.safetile];
+            this.mode = getCurrentMode();
+            return;
+        } else if (!canContinue) {
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
+            this.move(dir);
+        }
+    }
+
+    whileChasing(possibleExits) {
+        if (this.turnTimer < game.time.time) {
+            let distanceToObj = 999999;
+            let direction, decision, bestDecision;
+            for (let i = 0; i < possibleExits.length; i++) {
+                direction = possibleExits[i];
+                switch (direction) {
+                    case Phaser.LEFT:
+                        decision = new Phaser.Point((this.position.x - 1) * game.tileSize + (game.tileSize / 2),
+                            (this.position.y * game.tileSize) + (game.tileSize / 2));
+                        break;
+                    case Phaser.RIGHT:
+                        decision = new Phaser.Point((this.position.x + 1) * game.tileSize + (game.tileSize / 2),
+                            (this.position.y * game.tileSize) + (game.tileSize / 2));
+                        break;
+                    case Phaser.UP:
+                        decision = new Phaser.Point(this.position.x * game.tileSize + (game.tileSize / 2),
+                            ((this.position.y - 1) * game.tileSize) + (game.tileSize / 2));
+                        break;
+                    case Phaser.DOWN:
+                        decision = new Phaser.Point(this.position.x * game.tileSize + (game.tileSize / 2),
+                            ((this.position.y + 1) * game.tileSize) + (game.tileSize / 2));
+                        break;
+                    default:
+                        break;
+                }
+                let dist = this.ghostDestination.distance(decision);
+                if (dist < distanceToObj) {
+                    bestDecision = direction;
+                    distanceToObj = dist;
+                }
+            }
+
+            if (isSpecialTile({ x: this.position.x, y: this.position.y }) && bestDecision === Phaser.UP) {
+                bestDecision = this.currentDir;
+            }
+
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
+
+            // snap to grid exact position before turning
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+
+            this.lastPosition = { x: this.position.x, y: this.position.y };
+
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.move(bestDecision);
+
+            this.turnTimer = game.time.time + this.TURNING_COOLDOWN;
+        }
+    }
+
+    whileAtHome(canContinue) {
+        if (!canContinue) {
+            this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
+            this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
+            this.ghost.x = this.turnPoint.x;
+            this.ghost.y = this.turnPoint.y;
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
+            this.move(dir);
+        } else {
+            this.move(this.currentDir);
+        }
+    }
+
     /**
-         * Obtain ghost destination. Each destination is different.
-         */
+    * Obtain ghost destination. Each destination is different.
+    */
     getGhostDestination() {
         let dest, pacmanPos;
         switch (this.name) {
@@ -448,7 +469,7 @@ class Ghost {
     }
 
     /**
-     * Set Frightened mode
+     * Set Frigtened mode
      */
     enterFrightenedMode() {
         if (this.mode !== this.RETURNING_HOME) {
@@ -468,8 +489,6 @@ class Ghost {
         this.isFrightened = false;
         this.ghost.animations.currentAnim.stop();
     }
-
-
 
     /**
      * return ghost position
