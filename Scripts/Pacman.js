@@ -11,7 +11,6 @@ const game = new Phaser.Game(
     },
 );
 
-
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
@@ -84,6 +83,9 @@ function create() {
     addStarterTimer();
 }
 
+/**
+ * Add a timer to wait before launching the level.
+ */
 function addStarterTimer() {
     game.timerStart = game.time.create();
     game.timerStart.removeAll();
@@ -91,6 +93,9 @@ function addStarterTimer() {
     game.timerStart.start();
 }
 
+/**
+ * Start level while creating player, ghosts and initialise last things to use
+ */
 function startLevel() {
     game.player.create();
 
@@ -116,7 +121,6 @@ function startLevel() {
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
     sendExitOrder(game.pinky);
-
     addNoPlayerTimer(60);
 }
 
@@ -156,20 +160,13 @@ function update() {
 
             if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
                 if (game.currentMode < 7) game.currentMode++;
-                // console.log("DANS LE IF : " + game);
-                // console.log("DANS LE IF : " + game.time);
-                // console.log("DANS LE IF : " + game.time.time);
-                // console.log(game.currentMode)///////////////////////////////////// ATTENTION
-                // console.log("DANS LE IF : " + game.TIME_MODES);
-                // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode]);
-                // console.log("DANS LE IF : " + game.TIME_MODES[game.currentMode].time);
+
                 game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
                 if (game.TIME_MODES[game.currentMode].mode === "chase") {
                     sendAttackOrder();
                 } else {
                     sendScatterOrder();
                 }
-                console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
             }
             if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
                 game.changeModeTimer = game.time.time + game.remainingTime;
@@ -197,12 +194,19 @@ function render() {
     document.getElementById("lives").innerHTML = "Lives : " + game.player.lives;
 }
 
+/**
+ * Add a timer when there is no one playing
+ * @param {Phaser.Time} time time in seconds
+ */
 function addNoPlayerTimer(time) {
     game.time.removeAll();
 
     game.time.events.add(Phaser.Timer.SECOND * time, game.player.switchToPlayAlone, this);
 }
 
+/**
+ * return current mode
+ */
 function getCurrentMode() {
     if (!game.isPlayerChasing) {
         if (game.TIME_MODES[game.currentMode].mode === "scatter") {
@@ -215,6 +219,11 @@ function getCurrentMode() {
     }
 }
 
+/**
+ * Called when collision between ghost and pacman
+ * @param {*} player 
+ * @param {*} ghost 
+ */
 function dogEatsDog(player, ghost) {
     // if (game.player.isAdjacentToAnyGhost(ghost)) console.log("ADJACENT")
     if (game.isPlayerChasing) {
@@ -229,58 +238,37 @@ function dogEatsDog(player, ghost) {
     }
 }
 
-function getCurrentMode() {
-    if (!game.isPlayerChasing) {
-        if (game.TIME_MODES[game.currentMode].mode === "scatter") {
-            return "scatter";
-        } else {
-            return "chase";
-        }
-    } else {
-        return "random";
-    }
-}
-
+/**
+ * Make ghost immovable
+ */
 function stopGhosts() {
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].mode = game.ghosts[i].STOP;
     }
 }
 
+/**
+ * Remove ghosts. Called when player lose life and will restart the level
+ */
 function resetGhosts() {
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].mode = game.ghosts[i].reset();
     }
 }
 
-function gimeMeExitOrder(ghost) {
-    game.time.events.add(Math.random() * 3000, sendExitOrder, this, ghost);
-}
-
+/**
+ * Call update for each ghosts
+ */
 function updateGhosts() {
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].update();
     }
 }
 
-function sendAttackOrder() {
-    for (let i = 0; i < game.ghosts.length; i++) {
-        game.ghosts[i].exitFrightenedMode();
-        game.ghosts[i].attack();
-    }
-}
-
-function sendExitOrder(ghost) {
-    ghost.mode = game.clyde.EXIT_HOME;
-}
-
-function sendScatterOrder() {
-    for (let i = 0; i < game.ghosts.length; i++) {
-        game.ghosts[i].exitFrightenedMode();
-        game.ghosts[i].scatter();
-    }
-}
-
+/**
+ * Used to find the best way to chase
+ * @param {*} tile ghost tile position
+ */
 function isSpecialTile(tile) {
     for (let q = 0; q < game.SPECIAL_TILES.length; q++) {
         if (tile.x === game.SPECIAL_TILES[q].x && tile.y === game.SPECIAL_TILES[q].y) {
@@ -290,6 +278,44 @@ function isSpecialTile(tile) {
     return false;
 }
 
+/**
+ * launch a timer, send ghost out after this timer ends
+ * @param {*} ghost ghost to send out
+ */
+function gimeMeExitOrder(ghost) {
+    game.time.events.add(Math.random() * 3000, sendExitOrder, this, ghost);
+}
+
+/**
+ * Send a ghost out of his home
+ * @param {*} ghost ghost to send out
+ */
+function sendExitOrder(ghost) {
+    ghost.mode = game.clyde.EXIT_HOME;
+}
+
+/**
+ * Put in scatter mode
+ */
+function sendScatterOrder() {
+    for (let i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].exitFrightenedMode();
+        game.ghosts[i].scatter();
+    }
+}
+/**
+ * Attack mode when chasing activate
+ */
+function sendAttackOrder() {
+    for (let i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].exitFrightenedMode();
+        game.ghosts[i].attack();
+    }
+}
+
+/**
+ * Called when pacman eat a pill
+ */
 function enterFrightenedMode() {
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].enterFrightenedMode();
@@ -301,6 +327,10 @@ function enterFrightenedMode() {
     game.isPlayerChasing = true;
 }
 
+/**
+ * Function game over
+ */
 function gameOver() {
-    /////////////////////
+    console.log("game over")
+    // TO DO
 }
