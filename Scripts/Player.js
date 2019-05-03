@@ -98,6 +98,9 @@ class Player {
         }
     }
 
+    /**
+     * check inputs 
+     */
     checkKeys() {
         if (this.cursors.left.isDown ||
             this.cursors.right.isDown ||
@@ -122,7 +125,7 @@ class Player {
         }
 
         if (game.time.time > this.keyPressTimer) {
-            //  This forces them to hold the key down to turn the corner
+            //  This forces to hold the key down to turn the corner
             this.turning = Phaser.NONE;
             this.want2go = Phaser.NONE;
         } else {
@@ -130,6 +133,10 @@ class Player {
         }
     }
 
+    /**
+     * Check direction to go
+     * @param {number} turnTo Phaser.RIGHT, Phaser.LEFT, ...
+     */
     checkDirection(turnTo) {
         if (this.turning === turnTo || this.tiles_around[turnTo] === null || this.tiles_around[turnTo].index !== game.map.safetile) {
             //  If the direction is already the same, if there is no tile available here --> return
@@ -168,6 +175,10 @@ class Player {
         return true;
     }
 
+    /**
+     * Set the direction to go
+     * @param {number} direction Phaser.NONE, Phaser.RIGHT, ...
+     */
     move(direction) {
         if (direction === Phaser.NONE) {
             this.sprite.body.velocity.x = this.sprite.body.velocity.y = 0;
@@ -204,6 +215,11 @@ class Player {
         this.current = direction;
     }
 
+    /**
+     * Fired when a dot is eat
+     * @param {*} player 
+     * @param {*} dot 
+     */
     eatDot(player, dot) {
         dot.kill();
 
@@ -211,6 +227,11 @@ class Player {
         game.map.numDots--;
     }
 
+    /**
+     * Fired when a pill is eat
+     * @param {*} player 
+     * @param {*} dot 
+     */
     eatPill(player, pill) {
         pill.kill();
 
@@ -221,6 +242,9 @@ class Player {
         enterFrightenedMode();
     }
 
+    /**
+     * Used to count how many ghost were eaten since the mode was activated
+     */
     eatGhost() {
         if (this.ghostEatenScore < 1600) {
             this.ghostEatenScore *= 2;
@@ -228,14 +252,23 @@ class Player {
         }
     }
 
+    /**
+     * Reset ghost eaten score counter
+     */
     resetGhostEatenScoring() {
         this.ghostEatenScore = 200;
     }
 
+    /**
+     * Fired when there is no one playing since a time in seconds
+     */
     switchToPlayAlone() {
         game.player.isPlaying = false;
     }
 
+    /**
+     * When there is no one to play, pacman will choice random direction when he'll face a wall while walking by himself
+     */
     playAlone() {
         let player = game.player;
         switch (player.current) {
@@ -264,6 +297,9 @@ class Player {
         return;
     }
 
+    /**
+     * Player death
+     */
     die() {
         this.isDead = true;
         this.lives--;
@@ -278,6 +314,10 @@ class Player {
         if (!this.hasLives) gameOver();
     }
 
+    /**
+     * return random direction between all available
+     * @param {game.player} player instance of player
+     */
     getRandomDirection(player) {
         let tempArray = player.directions.slice();
         let index = player.tiles_around.indexOf(null, 1);
@@ -293,14 +333,23 @@ class Player {
         return tempArray[getRandomInt(1, tempArray.length - 1)];
     }
 
+    /**
+     * return player position
+     */
     getPosition() {
         return new Phaser.Point((this.position.x * game.tileSize) + (game.tileSize / 2), (this.position.y * game.tileSize) + (game.tileSize / 2));
     }
 
+    /**
+     * return player current direction
+     */
     getCurrentDirection() {
         return this.current;
     }
 
+    /**
+     * Check if player still have life
+     */
     hasLives() {
         return this.lives >= 0 ? true : false;
     }
