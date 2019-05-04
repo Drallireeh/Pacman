@@ -22,7 +22,6 @@ class Map {
         this.numDots = this.tilemap.createFromTiles(7, this.safetile, 'dot', this.layer, this.dots);
         this.totalDots = this.numDots;
 
-
         this.pills = game.add.physicsGroup();
         this.numPills = this.tilemap.createFromTiles(40, this.safetile, "pill", this.layer, this.pills);
 

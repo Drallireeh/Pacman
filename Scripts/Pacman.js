@@ -153,7 +153,7 @@ function update() {
                 sendExitOrder(game.inky);
             }
 
-            if (game.map.numDots < game.map.totalDots / 3 && !game.isClydeOut) {
+            if (game.map.totalDots - game.map.numDots > 65 && !game.isClydeOut) {
                 game.isClydeOut = true;
                 sendExitOrder(game.clyde);
             }
