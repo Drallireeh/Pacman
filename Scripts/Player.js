@@ -25,7 +25,7 @@ class Player {
 
         this.keyPressTimer = 0;
         this.KEY_COOLING_DOWN_TIME = 750;
-        this.ghostEatenScore = 200;
+        this.ghostEatenScore = 100;
 
         this.isPlaying = true;
     }
@@ -255,7 +255,7 @@ class Player {
      * Reset ghost eaten score counter
      */
     resetGhostEatenScoring() {
-        this.ghostEatenScore = 200;
+        this.ghostEatenScore = 100;
     }
 
     /**

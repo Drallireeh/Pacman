@@ -148,7 +148,7 @@ class Ghost {
                     this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
                     this.mode = this.CHASE;
                     break;
-                    
+
                 case this.STOP:
                     this.move(Phaser.NONE);
                     break;
@@ -261,7 +261,9 @@ class Ghost {
     }
 
     whileExitHome(canContinue) {
+        console.log(this.name, this.position)
         if (this.currentDir !== Phaser.UP && (this.position.x >= 13 || this.position.x <= 14)) {
+            console.log(this.name, "PREMIER IF")
             this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
@@ -269,6 +271,7 @@ class Ghost {
             this.move(Phaser.UP);
         }
         else if (this.currentDir === Phaser.UP && this.position.y == 11) {
+            console.log(this.name, "DEUXIEME IF")
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
@@ -277,6 +280,7 @@ class Ghost {
             this.mode = getCurrentMode();
             return;
         } else if (!canContinue) {
+            console.log(this.name, "TROISIEME IF")
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
