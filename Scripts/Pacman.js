@@ -288,7 +288,7 @@ function isSpecialTile(tile) {
  * @param {*} ghost ghost to send out
  */
 function gimeMeExitOrder(ghost) {
-    game.time.events.add(Math.random() * 3000, sendExitOrder, this, ghost);
+    game.time.events.add(500, sendExitOrder, this, ghost);
 }
 
 /**

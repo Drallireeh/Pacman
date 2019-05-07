@@ -230,7 +230,7 @@ class Ghost {
             if (this.flag = this.flag ? false : true) {
                 this.ghost.body.velocity.x = 0;
                 if (this.ghost.y < 14 * game.tileSize) {
-                    this.ghost.body.velocity.y = this.cruiseElroySpeed;
+                    this.ghost.body.velocity.y = this.cruiseElroySpeed; //ghostspeed maybe better
                     this.ghost.animations.play(23);
                 }
                 if (this.ghost.y > 15 * game.tileSize) {
@@ -256,7 +256,7 @@ class Ghost {
             this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.mode = this.AT_HOME;
-            sendExitOrder(this);
+            gimeMeExitOrder(this);
         }
     }
 
