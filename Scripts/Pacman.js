@@ -71,9 +71,12 @@ function create() {
         { x: 15, y: 23 }
     ];
 
+    game.pinky, game.blinky, game.inky, game.clyde = null;
+
     game.FRIGHTENED_MODE_TIME = 7000;
     game.level = 0;
     game.launched = false;
+    game.isFinished = false;
 
     game.debug.font = "40px arcade_normalregular";
 
@@ -99,8 +102,6 @@ function addStarterTimer() {
 function startLevel() {
     game.player.create();
 
-    game.pinky, game.blinky, game.inky, game.clyde = null;
-
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     game.changeModeTimer = 0;
@@ -118,6 +119,7 @@ function startLevel() {
     game.pinky = new Ghost("pinky", { x: 15, y: 14 }, Phaser.LEFT);
     game.inky = new Ghost("inky", { x: 14, y: 14 }, Phaser.RIGHT);
     game.clyde = new Ghost("clyde", { x: 17, y: 14 }, Phaser.LEFT);
+
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
     sendExitOrder(game.pinky);
@@ -133,11 +135,13 @@ function update() {
                     game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
                 }
             }
-
+            
             if (game.map.numDots === 0) {
-                game.level++;
                 game.player.move(Phaser.NONE);
-                stopGhosts();
+                game.level++;
+                game.isFinished = true;
+                game.player.isDead = true;
+                game.map.reset('map');
             }
 
             if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
@@ -176,7 +180,6 @@ function update() {
                 } else {
                     sendScatterOrder();
                 }
-                console.log("new mode:", game.TIME_MODES[game.currentMode].mode, game.TIME_MODES[game.currentMode].time);
             }
         }
 
@@ -251,7 +254,9 @@ function stopGhosts() {
  * Remove ghosts. Called when player lose life and will restart the level
  */
 function resetGhosts() {
+    stopGhosts();
     for (let i = 0; i < game.ghosts.length; i++) {
+        game.ghosts[i].mode = game.ghosts[i].STOP;
         game.ghosts[i].mode = game.ghosts[i].reset();
     }
 }

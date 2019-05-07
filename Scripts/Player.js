@@ -7,7 +7,7 @@ class Player {
         this.score = score;
         this.lives = lives;
 
-        this.speed = 100;
+        this.speed = 200;
 
         this.position = new Phaser.Point(14, 23);
         this.turnPoint = new Phaser.Point();
@@ -35,7 +35,6 @@ class Player {
         this.sprite.destroy();
 
         this.init(score, lives);
-        // this.create();
     }
 
     create() {
@@ -90,7 +89,7 @@ class Player {
             }
         }
         else {
-            if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
+            if (this.sprite.animations.currentAnim.isFinished && this.hasLives() || game.isFinished) {
                 this.respawn(this.score, this.lives);
                 resetGhosts();
                 addStarterTimer();

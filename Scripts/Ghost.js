@@ -30,6 +30,9 @@ class Ghost {
         this.ghostScatterSpeed = 75;
         this.ghostFrightenedSpeed = 50;
         this.cruiseElroySpeed = 110;
+
+        this.ghostDestination = null;
+
         this.directions = [null, null, null, null, null];
         this.opposites = [Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP];
         this.currentDir = startDir;
@@ -58,6 +61,7 @@ class Ghost {
                 offsetGhost = 12;
                 this.scatterDestination = new Phaser.Point((game.map.tilemap.width - 1) * game.tileSize, 0);
                 this.safetiles = [game.map.safetile];
+                this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
                 this.mode = this.SCATTER;
                 break;
 
@@ -85,7 +89,6 @@ class Ghost {
 
         this.move(this.startDir);
     }
-
 
     update() {
         if (this.mode !== this.RETURNING_HOME) {
@@ -119,6 +122,7 @@ class Ghost {
                     possibleExits.push(i);
                 }
             }
+
             switch (this.mode) {
                 case this.RANDOM:
                     this.whileInRandomMode(possibleExits, canContinue);
@@ -144,7 +148,7 @@ class Ghost {
                     this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
                     this.mode = this.CHASE;
                     break;
-
+                    
                 case this.STOP:
                     this.move(Phaser.NONE);
                     break;
@@ -210,8 +214,7 @@ class Ghost {
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
 
             // snap to grid exact position before turning
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
 
             this.lastPosition = { x: this.position.x, y: this.position.y };
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
@@ -250,8 +253,7 @@ class Ghost {
         if (this.hasReachedHome()) {
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.mode = this.AT_HOME;
             sendExitOrder(this);
@@ -262,16 +264,14 @@ class Ghost {
         if (this.currentDir !== Phaser.UP && (this.position.x >= 13 || this.position.x <= 14)) {
             this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.move(Phaser.UP);
         }
         else if (this.currentDir === Phaser.UP && this.position.y == 11) {
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.safetiles = [game.map.safetile];
             this.mode = getCurrentMode();
@@ -279,8 +279,7 @@ class Ghost {
         } else if (!canContinue) {
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
             this.move(dir);
@@ -313,7 +312,7 @@ class Ghost {
                     default:
                         break;
                 }
-                let dist = this.ghostDestination.distance(decision);
+                let dist = this.ghostDestination.distance(decision); //crash
                 if (dist < distanceToObj) {
                     bestDecision = direction;
                     distanceToObj = dist;
@@ -328,12 +327,12 @@ class Ghost {
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
 
             // snap to grid exact position before turning
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
 
             this.lastPosition = { x: this.position.x, y: this.position.y };
 
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+
             this.move(bestDecision);
 
             this.turnTimer = game.time.time + this.TURNING_COOLDOWN;
@@ -344,14 +343,18 @@ class Ghost {
         if (!canContinue) {
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
-            this.ghost.x = this.turnPoint.x;
-            this.ghost.y = this.turnPoint.y;
+            this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
             this.move(dir);
         } else {
             this.move(this.currentDir);
         }
+    }
+
+    setGhostPosWithTurnPoint() {
+        this.ghost.x = this.turnPoint.x;
+        this.ghost.y = this.turnPoint.y;
     }
 
     /**

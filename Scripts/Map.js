@@ -31,4 +31,9 @@ class Map {
         this.tilemap.setCollisionByExclusion([this.safetile], true, this.layer);
         // this.layer.setScale(2,2);
     }
+
+    reset(tilemap) {
+        this.tilemap.destroy();
+        this.create(tilemap);
+    }
 }
