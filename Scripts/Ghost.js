@@ -11,17 +11,10 @@ class Ghost {
         this.turnTimer = 0;
         this.TURNING_COOLDOWN = 100;
         this.RETURNING_COOLDOWN = 100;
-        this.RANDOM = "random";
-        this.SCATTER = "scatter";
-        this.CHASE = "chase";
-        this.STOP = "stop";
-        this.AT_HOME = "at_home";
-        this.EXIT_HOME = "leaving_home";
-        this.RETURNING_HOME = "returning_home";
         this.isAttacking = false;
         this.isFrightened = false;
 
-        this.mode = this.AT_HOME;
+        this.mode = AT_HOME;
         this.scatterDestination = new Phaser.Point((game.map.tilemap.width - 1) * game.tileSize, (game.map.tilemap.height - 1) * game.tileSize);
 
         this.limitCruiseElroy = 20;
@@ -62,7 +55,7 @@ class Ghost {
                 this.scatterDestination = new Phaser.Point((game.map.tilemap.width - 1) * game.tileSize, 0);
                 this.safetiles = [game.map.safetile];
                 this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
-                this.mode = this.SCATTER;
+                this.mode = SCATTER;
                 break;
 
             default:
@@ -91,7 +84,7 @@ class Ghost {
     }
 
     update() {
-        if (this.mode !== this.RETURNING_HOME) {
+        if (this.mode !== RETURNING_HOME) {
             game.physics.arcade.collide(this.ghost, game.map.layer);
         }
 
@@ -105,9 +98,9 @@ class Ghost {
             this.ghost.x = 1;
         }
 
-        if (this.isAttacking && (this.mode === this.SCATTER || this.mode === this.CHASE)) {
+        if (this.isAttacking && (this.mode === SCATTER || this.mode === CHASE)) {
             this.ghostDestination = this.getGhostDestination();
-            this.mode = this.CHASE;
+            this.mode = CHASE;
         }
 
         if (game.math.fuzzyEqual((this.position.x * game.tileSize) + (game.tileSize / 2), this.ghost.x, this.threshold) &&
@@ -124,32 +117,32 @@ class Ghost {
             }
 
             switch (this.mode) {
-                case this.RANDOM:
+                case RANDOM:
                     this.whileInRandomMode(possibleExits, canContinue);
                     break;
 
-                case this.RETURNING_HOME:
+                case RETURNING_HOME:
                     this.whileReturningHome();
                     break;
 
-                case this.CHASE:
+                case CHASE:
                     this.whileChasing(possibleExits);
                     break;
 
-                case this.AT_HOME:
+                case AT_HOME:
                     this.whileAtHome(canContinue);
                     break;
 
-                case this.EXIT_HOME:
+                case EXIT_HOME:
                     this.whileExitHome(canContinue);
                     break;
 
-                case this.SCATTER:
+                case SCATTER:
                     this.ghostDestination = new Phaser.Point(this.scatterDestination.x, this.scatterDestination.y);
-                    this.mode = this.CHASE;
+                    this.mode = CHASE;
                     break;
 
-                case this.STOP:
+                case STOP:
                     this.move(Phaser.NONE);
                     break;
             }
@@ -164,20 +157,20 @@ class Ghost {
         this.currentDir = dir;
 
         let speed = this.ghostSpeed;
-        if (getCurrentMode() === this.SCATTER) {
+        if (getCurrentMode() === SCATTER) {
             speed = this.ghostScatterSpeed;
         }
 
-        if (this.mode === this.RANDOM) {
+        if (this.mode === RANDOM) {
             speed = this.ghostFrightenedSpeed;
-        } else if (this.mode === this.RETURNING_HOME) {
+        } else if (this.mode === RETURNING_HOME) {
             speed = this.cruiseElroySpeed;
             if (!this.isFrightened) this.ghost.animations.play(dir + 20);
         } else {
             if (!this.isFrightened) this.ghost.animations.play(dir);
             if (this.name === "blinky" && game.map.numDots < this.limitCruiseElroy) {
                 speed = this.cruiseElroySpeed;
-                this.mode = this.CHASE;
+                this.mode = CHASE;
             }
         }
 
@@ -251,17 +244,17 @@ class Ghost {
             this.turnTimer = game.time.time + this.RETURNING_COOLDOWN;
         }
         if (this.hasReachedHome()) {
+            console.log(this.name, this.position, this.currentDir)
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
-            this.mode = this.AT_HOME;
-            gimeMeExitOrder(this);
+            this.mode = AT_HOME;
+            sendExitOrder(this);
         }
     }
 
     whileExitHome(canContinue) {
-        console.log(this.name, this.position)
         if (this.currentDir !== Phaser.UP && (this.position.x >= 13 || this.position.x <= 14)) {
             console.log(this.name, "PREMIER IF")
             this.turnPoint.x = (13 * game.tileSize) + (game.tileSize / 2);
@@ -277,6 +270,7 @@ class Ghost {
             this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.safetiles = [game.map.safetile];
+            console.log(getCurrentMode())
             this.mode = getCurrentMode();
             return;
         } else if (!canContinue) {
@@ -345,6 +339,7 @@ class Ghost {
 
     whileAtHome(canContinue) {
         if (!canContinue) {
+            console.log("can't continue")
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
@@ -352,6 +347,7 @@ class Ghost {
             let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
             this.move(dir);
         } else {
+            console.log("else at home, current dir : ", this.currentDir)
             this.move(this.currentDir);
         }
     }
@@ -453,11 +449,11 @@ class Ghost {
      * Set scatter mode
      */
     scatter() {
-        if (this.mode !== this.RETURNING_HOME) {
+        if (this.mode !== RETURNING_HOME) {
             if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
             this.isAttacking = false;
-            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
-                this.mode = this.SCATTER;
+            if (this.mode !== AT_HOME && this.mode != EXIT_HOME) {
+                this.mode = SCATTER;
             }
         }
     }
@@ -466,10 +462,10 @@ class Ghost {
      * Set attack mode
      */
     attack() {
-        if (this.mode !== this.RETURNING_HOME) {
+        if (this.mode !== RETURNING_HOME) {
             this.isAttacking = true;
             if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
-            if (this.mode !== this.AT_HOME && this.mode != this.EXIT_HOME) {
+            if (this.mode !== AT_HOME && this.mode !== EXIT_HOME) {
                 this.currentDir = this.opposites[this.currentDir];
             }
         }
@@ -479,11 +475,11 @@ class Ghost {
      * Set Frigtened mode
      */
     enterFrightenedMode() {
-        if (this.mode !== this.RETURNING_HOME) {
+        if (this.mode !== RETURNING_HOME) {
             this.ghost.play("begin frightened");
             this.isFrightened = true;
-            if (this.mode !== this.AT_HOME && this.mode !== this.EXIT_HOME) {
-                this.mode = this.RANDOM;
+            if (this.mode !== AT_HOME && this.mode !== EXIT_HOME) {
+                this.mode = RANDOM;
                 this.isAttacking = false;
             }
         }

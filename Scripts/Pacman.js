@@ -11,6 +11,14 @@ const game = new Phaser.Game(
     },
 );
 
+const RANDOM = 0;
+const SCATTER = 1;
+const CHASE = 2;
+const STOP = 3;
+const AT_HOME = 4;
+const EXIT_HOME = 5;
+const RETURNING_HOME = 6;
+
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
@@ -31,35 +39,35 @@ function preload() {
 function create() {
     game.TIME_MODES = [
         {
-            mode: "scatter",
+            mode: SCATTER,
             time: 7000
         },
         {
-            mode: "chase",
+            mode: CHASE,
             time: 20000
         },
         {
-            mode: "scatter",
+            mode: SCATTER,
             time: 7000
         },
         {
-            mode: "chase",
+            mode: CHASE,
             time: 20000
         },
         {
-            mode: "scatter",
+            mode: SCATTER,
             time: 5000
         },
         {
-            mode: "chase",
+            mode: CHASE,
             time: 20000
         },
         {
-            mode: "scatter",
+            mode: SCATTER,
             time: 5000
         },
         {
-            mode: "chase",
+            mode: CHASE,
             time: -1 // -1 = infinite
         }
     ];
@@ -131,7 +139,7 @@ function update() {
         game.timerStart.removeAll();
         if (!game.player.isDead) {
             for (let i = 0; i < game.ghosts.length; i++) {
-                if (game.ghosts[i].mode !== game.ghosts[i].RETURNING_HOME) {
+                if (game.ghosts[i].mode !== RETURNING_HOME) {
                     game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
                 }
             }
@@ -146,7 +154,7 @@ function update() {
 
             if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
                 for (let i = 0; i < game.ghosts.length; i++) {
-                    if (game.ghosts[i].mode !== game.clyde.RETURNING_HOME) {
+                    if (game.ghosts[i].mode !== RETURNING_HOME) {
                         game.ghosts[i].ghost.play("end frightened");
                     }
                 }
@@ -166,7 +174,7 @@ function update() {
                 if (game.currentMode < 7) game.currentMode++;
 
                 game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
-                if (game.TIME_MODES[game.currentMode].mode === "chase") {
+                if (game.TIME_MODES[game.currentMode].mode === CHASE) {
                     sendAttackOrder();
                 } else {
                     sendScatterOrder();
@@ -175,7 +183,7 @@ function update() {
             if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
                 game.changeModeTimer = game.time.time + game.remainingTime;
                 game.isPlayerChasing = false;
-                if (game.TIME_MODES[game.currentMode].mode === "chase") {
+                if (game.TIME_MODES[game.currentMode].mode === CHASE) {
                     sendAttackOrder();
                 } else {
                     sendScatterOrder();
@@ -212,13 +220,13 @@ function addNoPlayerTimer(time) {
  */
 function getCurrentMode() {
     if (!game.isPlayerChasing) {
-        if (game.TIME_MODES[game.currentMode].mode === "scatter") {
-            return "scatter";
+        if (game.TIME_MODES[game.currentMode].mode === SCATTER) {
+            return SCATTER;
         } else {
-            return "chase";
+            return CHASE;
         }
     } else {
-        return "random";
+        return RANDOM;
     }
 }
 
@@ -230,7 +238,8 @@ function getCurrentMode() {
 function dogEatsDog(player, ghost) {
     // if (game.player.isAdjacentToAnyGhost(ghost)) console.log("ADJACENT")
     if (game.isPlayerChasing) {
-        game[ghost.name].mode = game[ghost.name].RETURNING_HOME;
+        console.log(ghost, "has been eaten");
+        game[ghost.name].mode = RETURNING_HOME;
         game[ghost.name].ghostDestination = new Phaser.Point(14 * game.tileSize, 14 * game.tileSize);
         game[ghost.name].gotEat();
         game[ghost.name].resetSafeTiles();
@@ -246,7 +255,7 @@ function dogEatsDog(player, ghost) {
  */
 function stopGhosts() {
     for (let i = 0; i < game.ghosts.length; i++) {
-        game.ghosts[i].mode = game.ghosts[i].STOP;
+        game.ghosts[i].mode = STOP;
     }
 }
 
@@ -256,7 +265,7 @@ function stopGhosts() {
 function resetGhosts() {
     stopGhosts();
     for (let i = 0; i < game.ghosts.length; i++) {
-        game.ghosts[i].mode = game.ghosts[i].STOP;
+        game.ghosts[i].mode = STOP;
         game.ghosts[i].mode = game.ghosts[i].reset();
     }
 }
@@ -288,7 +297,14 @@ function isSpecialTile(tile) {
  * @param {*} ghost ghost to send out
  */
 function gimeMeExitOrder(ghost) {
-    game.time.events.add(500, sendExitOrder, this, ghost);
+    console.log("GIME EXIT ORDER FOR", ghost);
+    let timerStayHome = game.time.create();
+    console.log(timerStayHome)
+    timerStayHome.add(250, sendExitOrder, this, ghost);
+    console.log(timerStayHome)
+    timerStayHome.start();
+    console.log("AFTER GIME EXIT ORDER FOR", ghost);
+    // game.time.events.add(500, sendExitOrder, this, ghost);
 }
 
 /**
@@ -296,7 +312,9 @@ function gimeMeExitOrder(ghost) {
  * @param {*} ghost ghost to send out
  */
 function sendExitOrder(ghost) {
-    ghost.mode = game.clyde.EXIT_HOME;
+    console.log("SEND EXIT ORDER FOR", ghost);
+    console.log("exit order current dir, ", ghost.currentDir)
+    ghost.mode = EXIT_HOME;
 }
 
 /**

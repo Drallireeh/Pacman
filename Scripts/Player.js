@@ -7,7 +7,7 @@ class Player {
         this.score = score;
         this.lives = lives;
 
-        this.speed = 200;
+        this.speed = 100;
 
         this.position = new Phaser.Point(14, 23);
         this.turnPoint = new Phaser.Point();
