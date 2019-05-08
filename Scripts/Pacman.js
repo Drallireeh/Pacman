@@ -197,7 +197,10 @@ function update() {
 }
 
 function render() {
-    if (game.timerStart.running) game.debug.text(game.timerStart.duration / 1000, game.world.centerX - 100, game.world.centerY);
+    if (game.timerStart.running) {
+        game.debug.text(`Niveau ${game.level + 1}`, game.world.centerX - 150, game.world.centerY - 50);
+        game.debug.text(game.timerStart.duration / 1000, game.world.centerX - 100, game.world.centerY);
+    }
     else {
         game.debug.text();
     }
@@ -296,14 +299,7 @@ function isSpecialTile(tile) {
  * @param {*} ghost ghost to send out
  */
 function gimeMeExitOrder(ghost) {
-    console.log("GIME EXIT ORDER FOR", ghost);
-    let timerStayHome = game.time.create();
-    console.log(timerStayHome)
-    timerStayHome.add(250, sendExitOrder, this, ghost);
-    console.log(timerStayHome)
-    timerStayHome.start();
-    console.log("AFTER GIME EXIT ORDER FOR", ghost);
-    // game.time.events.add(500, sendExitOrder, this, ghost);
+    game.time.events.add(250, sendExitOrder, this, ghost);
 }
 
 /**
@@ -311,8 +307,6 @@ function gimeMeExitOrder(ghost) {
  * @param {*} ghost ghost to send out
  */
 function sendExitOrder(ghost) {
-    console.log("SEND EXIT ORDER FOR", ghost);
-    console.log("exit order current dir, ", ghost.currentDir)
     ghost.mode = EXIT_HOME;
 }
 
