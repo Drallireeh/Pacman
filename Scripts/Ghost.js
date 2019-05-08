@@ -244,11 +244,11 @@ class Ghost {
             this.turnTimer = game.time.time + this.RETURNING_COOLDOWN;
         }
         if (this.hasReachedHome()) {
-            console.log(this.name, this.position, this.currentDir)
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (this.position.y * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.currentDir = Phaser.RIGHT;
             this.mode = AT_HOME;
             sendExitOrder(this);
         }
@@ -270,7 +270,6 @@ class Ghost {
             this.setGhostPosWithTurnPoint();
             this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
             this.safetiles = [game.map.safetile];
-            console.log(getCurrentMode())
             this.mode = getCurrentMode();
             return;
         } else if (!canContinue) {
@@ -339,7 +338,6 @@ class Ghost {
 
     whileAtHome(canContinue) {
         if (!canContinue) {
-            console.log("can't continue")
             this.turnPoint.x = (this.position.x * game.tileSize) + (game.tileSize / 2);
             this.turnPoint.y = (14 * game.tileSize) + (game.tileSize / 2);
             this.setGhostPosWithTurnPoint();
@@ -347,7 +345,6 @@ class Ghost {
             let dir = (this.currentDir === Phaser.LEFT) ? Phaser.RIGHT : Phaser.LEFT;
             this.move(dir);
         } else {
-            console.log("else at home, current dir : ", this.currentDir)
             this.move(this.currentDir);
         }
     }
