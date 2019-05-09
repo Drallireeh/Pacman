@@ -205,10 +205,10 @@ function update() {
 
         if (game.gameOver) {
             if (game.restartKey.justPressed()) {
-                game.map.reset('map');
                 game.gameOver = false;
                 game.gameOverText.destroy();
                 game.player.respawn();
+                game.map.reset('map');
                 addStarterTimer();
             }
         }
