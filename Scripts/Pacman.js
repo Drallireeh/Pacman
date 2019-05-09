@@ -18,6 +18,8 @@ const STOP = 3;
 const AT_HOME = 4;
 const EXIT_HOME = 5;
 const RETURNING_HOME = 6;
+const STYLE = { font: "40px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
+const GAME_OVER_STYLE = { font: "16px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
 
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -37,8 +39,6 @@ function preload() {
 }
 
 function create() {
-    game.teststyle = { font: "65px Arial", fill: "#ff0044", align: "center" };
-
     game.TIME_MODES = [
         {
             mode: SCATTER,
@@ -87,6 +87,8 @@ function create() {
     game.level = 0;
     game.launched = false;
     game.isFinished = false;
+    game.restartKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    game.restartKey.enabled = false;
 
     game.debug.font = "40px arcade_normalregular";
 
@@ -109,12 +111,9 @@ function addStarterTimer() {
 
 function addNewLevelTimer() {
     game.timerLevel = game.time.create();
-    console.log(game.timerLevel)
     game.timerLevel.removeAll();
     game.timerLevel.add(1500, addStarterTimer, this);
-    console.log(game.timerLevel)
     game.timerLevel.start();
-    console.log(game.timerLevel)
 }
 
 /**
@@ -156,7 +155,7 @@ function update() {
                     game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
                 }
             }
-            
+
             if (game.map.numDots === 0) {
                 game.player.move(Phaser.NONE);
                 game.map.reset('map');
@@ -201,6 +200,16 @@ function update() {
                 } else {
                     sendScatterOrder();
                 }
+            }
+        }
+
+        if (game.gameOver) {
+            if (game.restartKey.justPressed()) {
+                game.map.reset('map');
+                game.gameOver = false;
+                game.gameOverText.destroy();
+                game.player.respawn();
+                addStarterTimer();
             }
         }
 
@@ -365,6 +374,12 @@ function enterFrightenedMode() {
  * Function game over
  */
 function gameOver() {
-    console.log("game over")
-    // TO DO
+    game.gameOver = true;
+
+    game.gameOverText = game.add.text(game.world.centerX, game.world.centerY - 50, "GAME OVER", STYLE);
+    game.gameOverText.anchor.set(0.5);
+    let text = game.add.text(game.world.centerX, game.world.centerY, "Press ENTER to relaunch", GAME_OVER_STYLE);
+    text.anchor.set(0.5)
+
+    game.restartKey.enabled = true;
 }

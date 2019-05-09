@@ -39,7 +39,7 @@ class Player {
 
     create() {
         // Add pacman sprite, add 8 for anchor
-        this.sprite = game.add.sprite((this.position.x * game.tileSize) + 8, (this.position.y * game.tileSize) + 8, 'pacman', 0);
+        this.sprite = game.add.sprite((14 * game.tileSize) + 8, (23 * game.tileSize) + 8, 'pacman', 0);
         this.sprite.anchor.setTo(0.5);
         this.sprite.animations.add('munch', [0, 1, 2, 1], 15, true);
         this.sprite.animations.add("death", [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 10, false);
@@ -89,8 +89,7 @@ class Player {
             }
         }
         else {
-            if (game.isFinished) 
-            {
+            if (game.isFinished) {
                 this.respawn(this.score, this.lives);
                 resetGhosts();
                 addNewLevelTimer();
@@ -99,6 +98,10 @@ class Player {
                 this.respawn(this.score, this.lives);
                 resetGhosts();
                 addStarterTimer();
+            }
+            else if (this.sprite.animations.currentAnim.isFinished && !this.hasLives()) {
+                resetGhosts();
+                gameOver();
             }
         }
     }
@@ -315,8 +318,6 @@ class Player {
             this.sprite.play("death");
             this.isAnimatingDeath = true;
         }
-
-        if (!this.hasLives) gameOver();
     }
 
     /**
