@@ -89,7 +89,13 @@ class Player {
             }
         }
         else {
-            if (this.sprite.animations.currentAnim.isFinished && this.hasLives() || game.isFinished) {
+            if (game.isFinished) 
+            {
+                this.respawn(this.score, this.lives);
+                resetGhosts();
+                addNewLevelTimer();
+            }
+            else if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
                 this.respawn(this.score, this.lives);
                 resetGhosts();
                 addStarterTimer();

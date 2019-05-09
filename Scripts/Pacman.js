@@ -37,6 +37,8 @@ function preload() {
 }
 
 function create() {
+    game.teststyle = { font: "65px Arial", fill: "#ff0044", align: "center" };
+
     game.TIME_MODES = [
         {
             mode: SCATTER,
@@ -102,6 +104,17 @@ function addStarterTimer() {
     game.timerStart.removeAll();
     game.timerStart.add(Phaser.Timer.SECOND * 3, startLevel, this);
     game.timerStart.start();
+    if (game.timerLevel) game.timerLevel = null;
+}
+
+function addNewLevelTimer() {
+    game.timerLevel = game.time.create();
+    console.log(game.timerLevel)
+    game.timerLevel.removeAll();
+    game.timerLevel.add(1500, addStarterTimer, this);
+    console.log(game.timerLevel)
+    game.timerLevel.start();
+    console.log(game.timerLevel)
 }
 
 /**
@@ -146,10 +159,10 @@ function update() {
             
             if (game.map.numDots === 0) {
                 game.player.move(Phaser.NONE);
+                game.map.reset('map');
                 game.level++;
                 game.isFinished = true;
                 game.player.isDead = true;
-                game.map.reset('map');
             }
 
             if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
@@ -197,9 +210,14 @@ function update() {
 }
 
 function render() {
+    if (game.timerLevel) {
+        game.debug.text("Level " + game.level, 100, game.world.centerY - 15);
+        game.debug.text("complete", 80, game.world.centerY + 30);
+    }
+
     if (game.timerStart.running) {
-        game.debug.text(`Niveau ${game.level + 1}`, game.world.centerX - 150, game.world.centerY - 50);
-        game.debug.text(game.timerStart.duration / 1000, game.world.centerX - 100, game.world.centerY);
+        game.debug.text(`Level ${game.level + 1}`, game.world.centerX - 150, game.world.centerY - 50);
+        game.debug.text(game.timerStart.duration / 1000, game.world.centerX - 110, game.world.centerY);
     }
     else {
         game.debug.text();
