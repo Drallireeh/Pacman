@@ -484,7 +484,7 @@ class Ghost {
      */
     exitFrightenedMode() {
         this.isFrightened = false;
-        this.ghost.animations.currentAnim.stop();
+        if (this.ghost.animations && this.ghost.animations.currentAnim) this.ghost.animations.currentAnim.stop();
     }
 
     /**

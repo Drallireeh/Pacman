@@ -34,7 +34,9 @@ class Player {
         this.sprite.body.destroy();
         this.sprite.destroy();
 
+        // console.log(this.isDead)
         this.init(score, lives);
+        // console.log(this.isDead)
     }
 
     create() {

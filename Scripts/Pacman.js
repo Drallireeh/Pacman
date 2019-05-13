@@ -102,6 +102,7 @@ function create() {
  * Add a timer to wait before launching the level.
  */
 function addStarterTimer() {
+    // console.log(game.player.isDead)
     game.timerStart = game.time.create();
     game.timerStart.removeAll();
     game.timerStart.add(Phaser.Timer.SECOND * 3, startLevel, this);
@@ -110,10 +111,13 @@ function addStarterTimer() {
 }
 
 function addNewLevelTimer() {
+    // console.log(game.player.isDead)
     game.timerLevel = game.time.create();
     game.timerLevel.removeAll();
     game.timerLevel.add(1500, addStarterTimer, this);
     game.timerLevel.start();
+    // console.log(game.player.isDead)
+
 }
 
 /**
@@ -158,10 +162,11 @@ function update() {
 
             if (game.map.numDots === 0) {
                 game.player.move(Phaser.NONE);
+                game.player.isDead = true;
+                game.isFinished = true;
                 game.map.reset('map');
                 game.level++;
-                game.isFinished = true;
-                game.player.isDead = true;
+                // console.log(game.player.isDead)
             }
 
             if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
