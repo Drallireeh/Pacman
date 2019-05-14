@@ -170,7 +170,7 @@ class Ghost {
             if (!this.isFrightened) {
                 this.ghost.animations.play(dir);
             }
-            if (this.name === "blinky" && game.map.numDots < this.limitCruiseElroy) {
+            if (this.name === "blinky" && game.map.numDots < this.limitCruiseElroy && this.mode !== AT_HOME && this.mode !== RETURNING_HOME && this.mode !== EXIT_HOME) {
                 speed = this.cruiseElroySpeed;
                 this.mode = CHASE;
             }
@@ -327,7 +327,7 @@ class Ghost {
 
             this.lastPosition = { x: this.position.x, y: this.position.y };
 
-            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y); // CRASH
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
 
             this.move(bestDecision);
 
@@ -448,7 +448,7 @@ class Ghost {
         if (this.mode !== RETURNING_HOME) {
             if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
             this.isAttacking = false;
-            if (this.mode !== AT_HOME && this.mode != EXIT_HOME) {
+            if (this.mode !== AT_HOME && this.mode !== EXIT_HOME) {
                 this.mode = SCATTER;
             }
         }
@@ -463,6 +463,8 @@ class Ghost {
             if (!this.isFrightened) this.ghost.animations.play(this.currentDir);
             if (this.mode !== AT_HOME && this.mode !== EXIT_HOME) {
                 this.currentDir = this.opposites[this.currentDir];
+                this.mode = CHASE;
+                console.log(game.TIME_MODES[game.currentMode].mode);
             }
         }
     }
