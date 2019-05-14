@@ -34,9 +34,7 @@ class Player {
         this.sprite.body.destroy();
         this.sprite.destroy();
 
-        // console.log(this.isDead)
         this.init(score, lives);
-        // console.log(this.isDead)
     }
 
     create() {
@@ -80,15 +78,16 @@ class Player {
             this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
             this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
 
+            if (!this.isPlaying) {
+                this.playAlone();
+            }
+
             if (this.turning !== Phaser.NONE) {
                 this.turn();
             }
 
             this.checkKeys();
 
-            if (!this.isPlaying) {
-                this.playAlone();
-            }
         }
         else {
             if (game.isFinished) {
@@ -116,7 +115,7 @@ class Player {
             this.cursors.right.isDown ||
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
-            addNoPlayerTimer(60);
+            addNoPlayerTimer(10);
             this.isPlaying = true;
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }

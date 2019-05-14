@@ -147,16 +147,18 @@ function startLevel() {
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
     sendExitOrder(game.pinky);
-    addNoPlayerTimer(60);
+    addNoPlayerTimer(10);
 }
 
 function update() {
     if (!game.timerStart.running) {
         game.timerStart.removeAll();
         if (!game.player.isDead) {
-            for (let i = 0; i < game.ghosts.length; i++) {
-                if (game.ghosts[i].mode !== RETURNING_HOME) {
-                    game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
+            if (game.player.isPlaying) {
+                for (let i = 0; i < game.ghosts.length; i++) {
+                    if (game.ghosts[i].mode !== RETURNING_HOME) {
+                        game.physics.arcade.overlap(game.player.sprite, game.ghosts[i].ghost, dogEatsDog, null, this);
+                    }
                 }
             }
 
