@@ -464,7 +464,6 @@ class Ghost {
             if (this.mode !== AT_HOME && this.mode !== EXIT_HOME) {
                 this.currentDir = this.opposites[this.currentDir];
                 this.mode = CHASE;
-                console.log(game.TIME_MODES[game.currentMode].mode);
             }
         }
     }

@@ -222,7 +222,7 @@ function update() {
         updateGhosts();
     }
     else game.isFinished = false;
-     
+
 }
 
 function render() {
