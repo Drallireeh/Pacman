@@ -16,26 +16,23 @@
         }
 
         body {
-            margin: 50;
+            margin: 0;
             padding: 0;
-            display: flex;
-            flex-flow: column wrap;
-            justify-content: flex-start;
-            align-items: center;
             background-color: #fff;
         }
 
         .text {
             color: #000000;
-            background-color: white;
             display: flex;
-            flex-flow: row;
+            flex-direction: row;
+            justify-content: center;
+            background-color: white;
             font-size: 30px;
             font-family: arcade_normalregular;
         }
 
         .text :first-child {
-            padding-right: 100px;
+            padding-right: 50px;
         }
     </style>
 </head>
@@ -46,7 +43,7 @@
         <div id="lives">Lives : </div>
     </div>
 
-    <div id="game-root"></div>
+    <div class="game-root"></div>
 
     <script src="Scripts/Libraries/phaser.min.js"></script>
     <script src="Scripts/Pacman.js"></script>
