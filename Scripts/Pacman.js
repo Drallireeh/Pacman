@@ -161,12 +161,11 @@ function update() {
             }
 
             if (game.map.numDots === 0) {
-                game.player.move(Phaser.NONE);
                 game.player.isDead = true;
-                game.isFinished = true;
-                game.map.reset('map');
+                game.player.move(Phaser.NONE);
                 game.level++;
-                // console.log(game.player.isDead)
+                game.map.reset('map');
+                game.isFinished = true;
             }
 
             if (game.time.time >= game.changeModeTimer - 3500 && game.isPlayerChasing) {
@@ -182,7 +181,7 @@ function update() {
                 sendExitOrder(game.inky);
             }
 
-            if (game.map.totalDots - game.map.numDots > 65 && !game.isClydeOut) {
+            if (game.map.totalDots - game.map.numDots > 60 && !game.isClydeOut) {
                 game.isClydeOut = true;
                 sendExitOrder(game.clyde);
             }
@@ -212,6 +211,7 @@ function update() {
             if (game.restartKey.justPressed()) {
                 game.gameOver = false;
                 game.gameOverText.destroy();
+                game.level = 0;
                 game.player.respawn();
                 game.map.reset('map');
                 addStarterTimer();
@@ -221,6 +221,8 @@ function update() {
         game.player.update();
         updateGhosts();
     }
+    else game.isFinished = false;
+     
 }
 
 function render() {

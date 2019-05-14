@@ -165,9 +165,11 @@ class Ghost {
             speed = this.ghostFrightenedSpeed;
         } else if (this.mode === RETURNING_HOME) {
             speed = this.cruiseElroySpeed;
-            if (!this.isFrightened) this.ghost.animations.play(dir + 20);
+            this.ghost.animations.play(dir + 20);
         } else {
-            if (!this.isFrightened) this.ghost.animations.play(dir);
+            if (!this.isFrightened) {
+                this.ghost.animations.play(dir);
+            }
             if (this.name === "blinky" && game.map.numDots < this.limitCruiseElroy) {
                 speed = this.cruiseElroySpeed;
                 this.mode = CHASE;
@@ -325,7 +327,7 @@ class Ghost {
 
             this.lastPosition = { x: this.position.x, y: this.position.y };
 
-            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y);
+            this.ghost.body.reset(this.turnPoint.x, this.turnPoint.y); // CRASH
 
             this.move(bestDecision);
 
@@ -485,6 +487,7 @@ class Ghost {
     exitFrightenedMode() {
         this.isFrightened = false;
         if (this.ghost.animations && this.ghost.animations.currentAnim) this.ghost.animations.currentAnim.stop();
+        this.ghost.play(this.currentDir);
     }
 
     /**

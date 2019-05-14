@@ -34,6 +34,9 @@ class Map {
 
     reset(tilemap) {
         this.tilemap.destroy();
+        this.tilemap = null;
+        this.layer = null;
+
         this.create(tilemap);
     }
 }
