@@ -188,8 +188,8 @@ function update() {
                 sendExitOrder(game.clyde);
             }
 
-            if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time) {
-                if (game.currentMode < 7) game.currentMode++;
+            if (game.changeModeTimer !== -1 && !game.isPlayerChasing && game.changeModeTimer < game.time.time && game.currentMode !== 7) {
+                game.currentMode++;
 
                 game.changeModeTimer = game.time.time + game.TIME_MODES[game.currentMode].time;
                 if (game.TIME_MODES[game.currentMode].mode === CHASE) {
@@ -198,6 +198,7 @@ function update() {
                     sendScatterOrder();
                 }
             }
+
             if (game.isPlayerChasing && game.changeModeTimer < game.time.time) {
                 game.changeModeTimer = game.time.time + game.remainingTime;
                 game.isPlayerChasing = false;
@@ -359,6 +360,7 @@ function sendScatterOrder() {
  * Attack mode when chasing activate
  */
 function sendAttackOrder() {
+    console.log("send attack order")
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].exitFrightenedMode();
         game.ghosts[i].attack();
