@@ -360,7 +360,6 @@ function sendScatterOrder() {
  * Attack mode when chasing activate
  */
 function sendAttackOrder() {
-    console.log("send attack order")
     for (let i = 0; i < game.ghosts.length; i++) {
         game.ghosts[i].exitFrightenedMode();
         game.ghosts[i].attack();
