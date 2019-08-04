@@ -33,7 +33,7 @@ function preload() {
     game.load.image('pill', '../Assets/Images/pill.png');
     game.load.image('dot', '../Assets/Images/dot.png');
     game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
-    game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16); // Version 16 pixels
+    game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16);
     game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
     game.load.tilemap('map', '../Assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
 }
@@ -102,7 +102,6 @@ function create() {
  * Add a timer to wait before launching the level.
  */
 function addStarterTimer() {
-    // console.log(game.player.isDead)
     game.timerStart = game.time.create();
     game.timerStart.removeAll();
     game.timerStart.add(Phaser.Timer.SECOND * 3, startLevel, this);
@@ -111,13 +110,10 @@ function addStarterTimer() {
 }
 
 function addNewLevelTimer() {
-    // console.log(game.player.isDead)
     game.timerLevel = game.time.create();
     game.timerLevel.removeAll();
     game.timerLevel.add(1500, addStarterTimer, this);
     game.timerLevel.start();
-    // console.log(game.player.isDead)
-
 }
 
 /**
@@ -388,7 +384,7 @@ function gameOver() {
 
     game.gameOverText = game.add.text(game.world.centerX, game.world.centerY - 50, "GAME OVER", STYLE);
     game.gameOverText.anchor.set(0.5);
-    let text = game.add.text(game.world.centerX, game.world.centerY, "Press ENTER to relaunch", GAME_OVER_STYLE);
+    let text = game.add.text(game.world.centerX, game.world.centerY, "Press RED BUTTON to relaunch", GAME_OVER_STYLE);
     text.anchor.set(0.5)
 
     game.restartKey.enabled = true;
