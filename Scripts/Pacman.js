@@ -87,7 +87,7 @@ function create() {
     game.level = 0;
     game.launched = false;
     game.isFinished = false;
-    game.restartKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    game.restartKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     game.restartKey.enabled = false;
 
     game.debug.font = "40px arcade_normalregular";
