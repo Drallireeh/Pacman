@@ -384,7 +384,7 @@ function gameOver() {
 
     game.gameOverText = game.add.text(game.world.centerX, game.world.centerY - 50, "GAME OVER", STYLE);
     game.gameOverText.anchor.set(0.5);
-    let text = game.add.text(game.world.centerX, game.world.centerY, "Press RED BUTTON to relaunch", GAME_OVER_STYLE);
+    let text = game.add.text(game.world.centerX, game.world.centerY, "Press red button to relaunch", GAME_OVER_STYLE);
     text.anchor.set(0.5)
 
     game.restartKey.enabled = true;
