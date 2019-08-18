@@ -109,6 +109,9 @@ function addStarterTimer() {
     if (game.timerLevel) game.timerLevel = null;
 }
 
+/**
+ * Add a message when we finish a level.
+ */
 function addNewLevelTimer() {
     game.timerLevel = game.time.create();
     game.timerLevel.removeAll();
@@ -210,10 +213,7 @@ function update() {
             if (game.restartKey.justPressed()) {
                 game.gameOver = false;
                 game.gameOverText.destroy();
-                game.level = 0;
-                game.player.respawn();
-                game.map.reset('map');
-                addStarterTimer();
+                resetLevel();
             }
         }
 
@@ -222,6 +222,16 @@ function update() {
     }
     else game.isFinished = false;
 
+}
+
+/**
+ * Reset all the level
+ */
+function resetLevel() {
+    game.level = 0;
+    game.player.respawn();
+    game.map.reset('map');
+    addStarterTimer();
 }
 
 function render() {

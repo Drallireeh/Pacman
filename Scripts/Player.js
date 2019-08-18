@@ -115,8 +115,8 @@ class Player {
             this.cursors.right.isDown ||
             this.cursors.up.isDown ||
             this.cursors.down.isDown) {
-            addNoPlayerTimer(10);
-            this.isPlaying = true;
+            if (!this.isPlaying) resetLevel();
+            else addNoPlayerTimer(10);
             this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
         }
 
