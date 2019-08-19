@@ -6,6 +6,7 @@ class Player {
     init(score = 0, lives = 2) {
         this.score = score;
         this.lives = lives;
+        // this.livesSpritesArray = [];
 
         this.speed = 100;
 
@@ -49,6 +50,11 @@ class Player {
 
         this.sprite.play('munch');
         this.move(Phaser.LEFT);
+
+        // for (let i = 0; i < this.lives; i++) {
+        //     let score_sprite = game.add.sprite(400, 50, "pacman_score");
+        //     this.livesSpritesArray.push(score_sprite);
+        // }
 
         this.cursors = game.input.keyboard.createCursorKeys();
     }

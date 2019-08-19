@@ -18,8 +18,8 @@ const STOP = 3;
 const AT_HOME = 4;
 const EXIT_HOME = 5;
 const RETURNING_HOME = 6;
-const STYLE = { font: "40px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
-const GAME_OVER_STYLE = { font: "16px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
+const STYLE = { font: "48px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
+const GAME_OVER_STYLE = { font: "26px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
 
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -35,6 +35,7 @@ function preload() {
     game.load.image('tiles', '../Assets/Images/pacman-tiles.png');
     game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16);
     game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
+    game.load.image('pacman_score', '../Assets/Images/pacman_score.png', 16, 16);
     game.load.tilemap('map', '../Assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -394,8 +395,9 @@ function gameOver() {
 
     game.gameOverText = game.add.text(game.world.centerX, game.world.centerY - 50, "GAME OVER", STYLE);
     game.gameOverText.anchor.set(0.5);
-    let text = game.add.text(game.world.centerX, game.world.centerY, "Press red button to relaunch", GAME_OVER_STYLE);
-    text.anchor.set(0.5)
+    let text = game.add.text(game.world.centerX, game.world.centerY + 10, "Press red button\n  to relaunch", GAME_OVER_STYLE);
+    text.anchor.set(0.5);
+    text.fontStyle = "normal";
 
     game.restartKey.enabled = true;
 }
