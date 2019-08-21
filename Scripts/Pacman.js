@@ -96,7 +96,30 @@ function create() {
     game.map = new Map('map');
     game.player = new Player();
 
+    game.livesDom = document.getElementById("lives");
+
+    addPacmanLivesImg();
+
     addStarterTimer();
+}
+
+/**
+ * Add img of pacman for each lives player has
+ */
+function addPacmanLivesImg() {
+    for (let i = 0; i < game.player.lives; i++) {
+        let pacLifeImg = document.createElement("img");
+        pacLifeImg.setAttribute("src", "../Assets/Images/pacman_score.png");
+        pacLifeImg.setAttribute("id", "life" + i);
+        game.livesDom.appendChild(pacLifeImg);
+    }
+}
+
+/**
+ * Remove an img of pacman lives. Called when we lose a life
+ */
+function removePacmanLivesImg() {
+    game.livesDom.removeChild(document.getElementById("life" + game.player.lives));
 }
 
 /**
@@ -232,6 +255,8 @@ function resetLevel() {
     game.level = 0;
     game.player.respawn();
     game.map.reset('map');
+    game.livesDom.innerHTML = "lives : ";
+    addPacmanLivesImg();
     addStarterTimer();
 }
 
@@ -249,7 +274,6 @@ function render() {
         game.debug.text();
     }
     document.getElementById("score").innerHTML = "Score : " + game.player.score;
-    document.getElementById("lives").innerHTML = "Lives : " + game.player.lives;
 }
 
 /**
@@ -397,7 +421,6 @@ function gameOver() {
     game.gameOverText.anchor.set(0.5);
     let text = game.add.text(game.world.centerX, game.world.centerY + 10, "Press red button\n  to relaunch", GAME_OVER_STYLE);
     text.anchor.set(0.5);
-    text.fontStyle = "normal";
 
     game.restartKey.enabled = true;
 }
