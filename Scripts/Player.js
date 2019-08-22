@@ -87,7 +87,6 @@ class Player {
             }
 
             this.checkKeys();
-
         }
         else {
             if (game.isFinished) {
@@ -112,34 +111,36 @@ class Player {
      * check inputs 
      */
     checkKeys() {
-        if (this.cursors.left.isDown ||
-            this.cursors.right.isDown ||
-            this.cursors.up.isDown ||
-            this.cursors.down.isDown) {
-            if (!this.isPlaying) resetLevel();
-            else addNoPlayerTimer(10);
-            this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
-        }
+        if (!game.isFinished) {
+            if (this.cursors.left.isDown ||
+                this.cursors.right.isDown ||
+                this.cursors.up.isDown ||
+                this.cursors.down.isDown) {
+                if (!this.isPlaying) resetLevel();
+                else addNoPlayerTimer(10);
+                this.keyPressTimer = game.time.time + this.KEY_COOLING_DOWN_TIME;
+            }
 
-        if (this.cursors.left.isDown && this.current !== Phaser.LEFT) {
-            this.want2go = Phaser.LEFT;
-        }
-        else if (this.cursors.right.isDown && this.current !== Phaser.RIGHT) {
-            this.want2go = Phaser.RIGHT;
-        }
-        else if (this.cursors.up.isDown && this.current !== Phaser.UP) {
-            this.want2go = Phaser.UP;
-        }
-        else if (this.cursors.down.isDown && this.current !== Phaser.DOWN) {
-            this.want2go = Phaser.DOWN;
-        }
+            if (this.cursors.left.isDown && this.current !== Phaser.LEFT) {
+                this.want2go = Phaser.LEFT;
+            }
+            else if (this.cursors.right.isDown && this.current !== Phaser.RIGHT) {
+                this.want2go = Phaser.RIGHT;
+            }
+            else if (this.cursors.up.isDown && this.current !== Phaser.UP) {
+                this.want2go = Phaser.UP;
+            }
+            else if (this.cursors.down.isDown && this.current !== Phaser.DOWN) {
+                this.want2go = Phaser.DOWN;
+            }
 
-        if (game.time.time > this.keyPressTimer) {
-            //  This forces to hold the key down to turn the corner
-            this.turning = Phaser.NONE;
-            this.want2go = Phaser.NONE;
-        } else {
-            this.checkDirection(this.want2go);
+            if (game.time.time > this.keyPressTimer) {
+                //  This forces to hold the key down to turn the corner
+                this.turning = Phaser.NONE;
+                this.want2go = Phaser.NONE;
+            } else {
+                this.checkDirection(this.want2go);
+            }
         }
     }
 

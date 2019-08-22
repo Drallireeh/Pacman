@@ -175,7 +175,9 @@ function startLevel() {
 
 function update() {
     if (!game.timerStart.running) {
+        
         game.timerStart.removeAll();
+
         if (!game.player.isDead) {
             if (game.player.isPlaying) {
                 for (let i = 0; i < game.ghosts.length; i++) {
@@ -245,7 +247,6 @@ function update() {
         updateGhosts();
     }
     else game.isFinished = false;
-
 }
 
 /**
