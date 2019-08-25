@@ -36,7 +36,7 @@ function preload() {
     game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16);
     game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
     game.load.image('pacman_score', '../Assets/Images/pacman_score.png', 16, 16);
-    game.load.tilemap('map', '../Assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', '../Assets/pacman-map-final.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
 function create() {
