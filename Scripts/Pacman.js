@@ -36,7 +36,7 @@ function preload() {
     game.load.spritesheet('pacman', '../Assets/Images/pacman16.png', 16, 16);
     game.load.spritesheet('ghosts', '../Assets/Images/ghosts16.png', 16, 16);
     game.load.image('pacman_score', '../Assets/Images/pacman_score.png', 16, 16);
-    game.load.tilemap('map', '../Assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', '../Assets/pacman-map-final.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
 function create() {
@@ -147,7 +147,8 @@ function addNewLevelTimer() {
  * Start level while creating player, ghosts and initialise last things to use
  */
 function startLevel() {
-    game.time.removeAll();
+    addNoPlayerTimer(10); // Reset timer, need while it's in Game Over mode
+    
     game.player.create();
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -171,6 +172,7 @@ function startLevel() {
     game.ghosts.push(game.clyde, game.pinky, game.inky, game.blinky);
 
     sendExitOrder(game.pinky);
+    
     addNoPlayerTimer(10);
 }
 
@@ -243,11 +245,10 @@ function update() {
                 resetLevel();
             }
         }
-        else 
-        {
+        else {
             game.player.update();
+            updateGhosts();
         }
-        updateGhosts();
     }
     else game.isFinished = false;
 }
@@ -257,12 +258,8 @@ function update() {
  */
 function resetLevel() {
     game.level = 0;
-    game.player = null;
-    game.map = null;
-    game.map = new Map('map');
-    game.player = new Player();
-    // game.player.respawn();
-    // game.map.reset('map');
+    game.player.respawn();
+    game.map.reset('map');
     game.livesDom.innerHTML = "lives : ";
     addPacmanLivesImg();
     addStarterTimer();
