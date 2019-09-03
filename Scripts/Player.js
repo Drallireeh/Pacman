@@ -54,58 +54,58 @@ class Player {
     }
 
     update() {
-        if (!this.isDead) {
-            // Enable collisions
-            game.physics.arcade.collide(this.sprite, game.map.layer);
-            game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
-            game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
+            if (!this.isDead) {
+                // Enable collisions
+                game.physics.arcade.collide(this.sprite, game.map.layer);
+                game.physics.arcade.overlap(this.sprite, game.map.dots, this.eatDot, null, this);
+                game.physics.arcade.overlap(this.sprite, game.map.pills, this.eatPill, null, this);
 
-            // set position with tiles position
-            this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
-            this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
+                // set position with tiles position
+                this.position.x = game.math.snapToFloor(Math.floor(this.sprite.x), game.tileSize) / game.tileSize;
+                this.position.y = game.math.snapToFloor(Math.floor(this.sprite.y), game.tileSize) / game.tileSize;
 
-            // Where we can go from left to right side, maybe to remove later
-            if (this.position.x < 0) {
-                this.sprite.x = game.map.tilemap.widthInPixels - 1;
+                // Where we can go from left to right side, maybe to remove later
+                if (this.position.x < 0) {
+                    this.sprite.x = game.map.tilemap.widthInPixels - 1;
+                }
+                if (this.position.x >= game.map.tilemap.width) {
+                    this.sprite.x = 1;
+                }
+
+                // Check which tiles are around us
+                this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
+                this.tiles_around[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
+                this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
+                this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
+
+                if (!this.isPlaying) {
+                    this.playAlone();
+                }
+
+                if (this.turning !== Phaser.NONE) {
+                    this.turn();
+                }
+
+                this.checkKeys();
             }
-            if (this.position.x >= game.map.tilemap.width) {
-                this.sprite.x = 1;
+            else {
+                if (game.isFinished) {
+                    this.respawn(this.score, this.lives);
+                    resetGhosts();
+                    addNewLevelTimer();
+                }
+                else if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
+                    this.respawn(this.score, this.lives);
+                    removePacmanLivesImg();
+                    resetGhosts();
+                    addStarterTimer();
+                }
+                else if (this.sprite.animations.currentAnim.isFinished && !this.hasLives()) {
+                    resetGhosts();
+                    gameOver();
+                }
             }
-
-            // Check which tiles are around us
-            this.tiles_around[1] = game.map.tilemap.getTileLeft(game.map.layer.index, this.position.x, this.position.y);
-            this.tiles_around[2] = game.map.tilemap.getTileRight(game.map.layer.index, this.position.x, this.position.y);
-            this.tiles_around[3] = game.map.tilemap.getTileAbove(game.map.layer.index, this.position.x, this.position.y);
-            this.tiles_around[4] = game.map.tilemap.getTileBelow(game.map.layer.index, this.position.x, this.position.y);
-
-            if (!this.isPlaying) {
-                this.playAlone();
-            }
-
-            if (this.turning !== Phaser.NONE) {
-                this.turn();
-            }
-
-            this.checkKeys();
         }
-        else {
-            if (game.isFinished) {
-                this.respawn(this.score, this.lives);
-                resetGhosts();
-                addNewLevelTimer();
-            }
-            else if (this.sprite.animations.currentAnim.isFinished && this.hasLives()) {
-                this.respawn(this.score, this.lives);
-                removePacmanLivesImg();
-                resetGhosts();
-                addStarterTimer();
-            }
-            else if (this.sprite.animations.currentAnim.isFinished && !this.hasLives()) {
-                resetGhosts();
-                gameOver();
-            }
-        }
-    }
 
     /**
      * check inputs 
