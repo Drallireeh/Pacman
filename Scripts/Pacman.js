@@ -20,6 +20,8 @@ const EXIT_HOME = 5;
 const RETURNING_HOME = 6;
 const STYLE = { font: "48px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
 const GAME_OVER_STYLE = { font: "26px arcade_normalregular", fill: "#ffffff", boundsAlignH: "center", boundsAlignV: "middle" };
+const RESTART_GAME_KEYORDER = ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", " "];
+const RESTART_GAME_KEYORDER_TWO = ["ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "Enter"];
 
 function preload() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -90,8 +92,14 @@ function create() {
     game.isFinished = false;
     game.restartKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     game.restartKey.enabled = false;
+    game.restartKeyTwo = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    game.restartKeyTwo.enabled = false;
 
     game.debug.font = "40px arcade_normalregular";
+
+    window.onerror = function() {
+        restartWhenCrash();
+    }
 
     game.map = new Map('map');
     game.player = new Player();
@@ -239,7 +247,8 @@ function update() {
         }
 
         if (game.gameOver) {
-            if (game.restartKey.justPressed()) {
+            if (game.restartKey.justPressed() || game.restartKeyTwo.justPressed()) {
+                console.log("restart key pressed")
                 game.gameOver = false;
                 game.gameOverText.destroy();
                 resetLevel();
@@ -428,4 +437,21 @@ function gameOver() {
     text.anchor.set(0.5);
 
     game.restartKey.enabled = true;
+}
+
+function restartWhenCrash() {
+    let buffer = [];
+
+    document.addEventListener('keydown', event => {
+        if (buffer.length === 5) buffer = [];
+        const key = event.key;
+        buffer.push(key);
+
+        if (buffer.length === 5){
+            for (let i = 0; i < 5; i++) {
+                if (buffer[i] !== RESTART_GAME_KEYORDER[i] && buffer[i] !== RESTART_GAME_KEYORDER_TWO[i]) return;
+            }
+            location.reload();
+        }
+    });
 }
